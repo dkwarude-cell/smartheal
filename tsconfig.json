@@ -1,0 +1,73 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "target": "esnext",
+    "lib": [
+      "esnext"
+    ],
+    "jsx": "react-native",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@screens/*": [
+        "src/screens/*"
+      ],
+      "@navigation/*": [
+        "src/navigation/*"
+      ],
+      "@context/*": [
+        "src/context/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ],
+      "@types/*": [
+        "src/types/*"
+      ],
+      "@theme/*": [
+        "src/theme/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ]
+    }
+  },
+  "include": [
+    "App.tsx",
+    "index.js",
+    "src/screens/**/*",
+    "src/navigation/**/*",
+    "src/context/**/*",
+    "src/services/**/*",
+    "src/config/**/*",
+    "src/types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/App.tsx",
+    "src/App.tsx.old.web",
+    "src/main.tsx",
+    "src/components/**/*",
+    "src/assets/**/*",
+    "src/styles/**/*",
+    "src/functions/**/*",
+    "src/guidelines/**/*",
+    "src/rn-app/**/*",
+    "src/*.tsx",
+    "src/*.ts",
+    "src/*.md"
+  ]
+}

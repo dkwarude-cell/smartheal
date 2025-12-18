@@ -1,0 +1,69 @@
+{
+  "expo": {
+    "name": "SmartHeal",
+    "slug": "smartheal-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#00C6AE"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.runverve.smartheal",
+      "infoPlist": {
+        "NSCameraUsageDescription": "SmartHeal needs camera access for AI-powered therapy placement guidance",
+        "NSMicrophoneUsageDescription": "SmartHeal needs microphone access for voice control features",
+        "NSBluetoothAlwaysUsageDescription": "SmartHeal needs Bluetooth to connect to your therapy device",
+        "NSPhotoLibraryUsageDescription": "SmartHeal needs access to your photo library to analyze therapy images"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#00C6AE"
+      },
+      "package": "com.runverve.smartheal",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_CONNECT",
+        "BLUETOOTH_SCAN",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow SmartHeal to access your camera for AI guidance"
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow SmartHeal to access your microphone for voice control"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    }
+  }
+}
