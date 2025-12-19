@@ -13,6 +13,9 @@ import ProfileDetailsScreen from '../screens/ProfileDetailsScreen';
 import InterestsSelectionScreen from '../screens/InterestsSelectionScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import BasicInfoScreen from '../screens/BasicInfoScreen';
+import MedicalHistoryScreen from '../screens/MedicalHistoryScreen';
+import GoalsScreen from '../screens/GoalsScreen';
+import SetupCompleteScreen from '../screens/SetupCompleteScreen';
 import DeviceConnectionScreen from '../screens/DeviceConnectionScreen';
 import ConnectionSuccessScreen from '../screens/ConnectionSuccessScreen';
 
@@ -28,6 +31,15 @@ export type RootStackParamList = {
   ProfileDetails: { profileType: 'athlete' | 'health' | 'coach' };
   Interests: { profileType: 'athlete' | 'health' | 'coach' };
   BasicInfo: undefined;
+  MedicalHistory: { weightKg?: number; heightCm?: number } | undefined;
+  Goals: {
+    weightKg?: number;
+    heightCm?: number;
+    conditions?: string[];
+    severity?: Record<string, 'Low' | 'Medium' | 'High'>;
+    subtypes?: Record<string, string | undefined>;
+  } | undefined;
+  SetupComplete: undefined;
   Welcome: undefined;
   DeviceConnection: undefined;
   ConnectionSuccess: undefined;
@@ -63,8 +75,11 @@ export const AppNavigator = () => {
         <Stack.Screen name="Interests" component={InterestsSelectionScreen} />
         <Stack.Screen name="DeviceConnection" component={DeviceConnectionScreen} />
         <Stack.Screen name="ConnectionSuccess" component={ConnectionSuccessScreen} />
+        <Stack.Screen name="SetupComplete" component={SetupCompleteScreen} />
         <Stack.Screen name="MainApp" component={MainTabNavigator} />
-          <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
+        <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
+        <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
+        <Stack.Screen name="Goals" component={GoalsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

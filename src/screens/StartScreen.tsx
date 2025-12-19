@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 12,
     paddingBottom: 28,
   },
   headerRow: {

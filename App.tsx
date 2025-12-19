@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 // Context Providers
 import { AuthProvider } from './src/context/AuthContext';
@@ -51,14 +51,16 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <DeviceProvider>
-              <StatusBar style="light" />
-              <AppNavigator />
-            </DeviceProvider>
-          </ThemeProvider>
-        </AuthProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF5EF' }} edges={['top', 'left', 'right']}>
+          <AuthProvider>
+            <ThemeProvider>
+              <DeviceProvider>
+                <StatusBar style="dark" backgroundColor="#FFF5EF" translucent={false} />
+                <AppNavigator />
+              </DeviceProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -43,7 +44,12 @@ const BasicInfoScreen = ({ navigation }: Props) => {
       Alert.alert('Missing info', 'Please complete all fields before continuing.');
       return;
     }
-    navigation.navigate('MainApp');
+    const weightKg = parseFloat(weight);
+    const heightCm = parseFloat(height);
+    navigation.navigate('MedicalHistory', {
+      weightKg: Number.isFinite(weightKg) ? weightKg : undefined,
+      heightCm: Number.isFinite(heightCm) ? heightCm : undefined,
+    });
   };
 
   const renderSelect = (
@@ -107,8 +113,8 @@ const BasicInfoScreen = ({ navigation }: Props) => {
   );
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF5EF" />
       <LinearGradient colors={['#FFF5EF', '#FFFFFF']} style={styles.gradient}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.topRow}>
@@ -188,7 +194,15 @@ const BasicInfoScreen = ({ navigation }: Props) => {
                 <Icon name="chevron-right" size={18} color="#FFFFFF" />
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.skipButton} onPress={() => navigation.navigate('MainApp')}>
+            <TouchableOpacity
+              style={styles.skipButton}
+              onPress={() =>
+                navigation.navigate('MedicalHistory', {
+                  weightKg: undefined,
+                  heightCm: undefined,
+                })
+              }
+            >
               <Text style={styles.skipText}>Skip for now</Text>
             </TouchableOpacity>
           </View>
@@ -220,11 +234,12 @@ const BasicInfoScreen = ({ navigation }: Props) => {
           </Modal>
         </ScrollView>
       </LinearGradient>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: '#FFF5EF' },
   container: { flex: 1 },
   gradient: { flex: 1 },
   scrollContent: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 28 },

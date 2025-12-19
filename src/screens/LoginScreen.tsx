@@ -228,6 +228,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F5F7',
     borderColor: '#E5E7EB',
     height: 52,
+    color: '#111827',
+    fontWeight: '600',
   },
   toggleText: {
     color: '#FF0000',

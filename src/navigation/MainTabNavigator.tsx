@@ -18,18 +18,19 @@ export const MainTabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#1A1A1A',
-          borderTopColor: '#333333',
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#E5E7EB',
           borderTopWidth: 1,
           height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
+          paddingBottom: 8,
+          paddingTop: 8,
+          elevation: 12,
         },
-        tabBarActiveTintColor: '#FF0000',
-        tabBarInactiveTintColor: '#666666',
+        tabBarActiveTintColor: '#F52E32',
+        tabBarInactiveTintColor: '#9CA3AF',
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
+          fontSize: 11,
+          fontWeight: '700',
         },
       }}
     >
