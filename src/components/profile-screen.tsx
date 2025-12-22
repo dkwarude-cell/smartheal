@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Switch } from './ui/switch';
-import { Badge } from './ui/badge';
-import { 
-  User, 
-  Settings, 
-  Bell, 
-  Shield, 
-  Smartphone,
-  Heart,
-  Calendar,
-  Edit3,
-  ChevronRight,
-  Battery,
-  Clock,
-  Wifi
-} from 'lucide-react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ProfileScreenProps {
   onNavigate: (screen: string) => void;
@@ -29,7 +12,6 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   const [notifications, setNotifications] = useState(true);
   const [dataSharing, setDataSharing] = useState(false);
 
-  // Static user data - prevents loading glitches
   const userInfo = {
     name: 'Sarah Johnson',
     email: 'sarah.johnson@email.com',
@@ -39,7 +21,6 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
     membershipTier: 'Premium'
   };
 
-  // Static device data - ensures reliable display
   const deviceInfo = {
     model: 'ITT Therapeutic Device Pro',
     serialNumber: 'ITT-2023-8847',
@@ -56,268 +37,542 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
     { label: 'Auto-Start Sessions', value: 'Enabled', editable: false }
   ];
 
-  const settingsOptions = [
-    {
-      icon: Bell,
-      title: 'Notifications',
-      description: 'Session reminders and updates',
-      action: () => {},
-      rightElement: (
-        <Switch
-          checked={notifications}
-          onCheckedChange={setNotifications}
-        />
-      )
-    },
-    {
-      icon: Shield,
-      title: 'Privacy & Data',
-      description: 'Control your data sharing preferences',
-      action: () => {},
-      rightElement: <ChevronRight className="w-5 h-5 text-gray-400" />
-    },
-    {
-      icon: Smartphone,
-      title: 'Device Settings',
-      description: 'Manage connected device preferences',
-      action: () => onNavigate('settings'),
-      rightElement: <ChevronRight className="w-5 h-5 text-gray-400" />
-    },
-    {
-      icon: Heart,
-      title: 'Health Integration',
-      description: 'Connect with Google Fit and Apple Health',
-      action: () => {},
-      rightElement: <ChevronRight className="w-5 h-5 text-gray-400" />
-    }
-  ];
-
   return (
-    <div className="min-h-full p-4 space-y-4 pb-8">
-      {/* Profile Header - Enhanced with Proper Loading States */}
-      <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-800">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium dark:text-white">Profile</h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setEditMode(!editMode)}
-            className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full px-4 font-medium"
-          >
-            <Edit3 className="w-4 h-4 mr-1" />
-            {editMode ? 'Save' : 'Edit Profile'}
-          </Button>
-        </div>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      {/* Profile Header */}
+      <LinearGradient colors={['#EFF6FF', '#F5F3FF']} style={styles.profileCard}>
+        <View style={styles.profileHeader}>
+          <Text style={styles.cardTitle}>Profile</Text>
+          <TouchableOpacity onPress={() => setEditMode(!editMode)} style={styles.editButton}>
+            <Icon name="pencil" size={16} color="#3B82F6" />
+            <Text style={styles.editButtonText}>{editMode ? 'Save' : 'Edit Profile'}</Text>
+          </TouchableOpacity>
+        </View>
         
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <div className="flex-1">
+        <View style={styles.profileContent}>
+          <LinearGradient colors={['#3B82F6', '#8B5CF6']} style={styles.avatar}>
+            <Icon name="account" size={32} color="#FFFFFF" />
+          </LinearGradient>
+          <View style={styles.profileInfo}>
             {editMode ? (
-              <div className="space-y-3">
-                <input 
-                  defaultValue={userInfo.name} 
-                  className="text-lg font-medium bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-blue-500 dark:text-white w-full"
+              <View style={styles.editForm}>
+                <TextInput
+                  style={styles.editInput}
+                  defaultValue={userInfo.name}
                   placeholder="Full Name"
+                  placeholderTextColor="#9CA3AF"
                 />
-                <input 
-                  defaultValue={userInfo.email} 
-                  type="email"
-                  className="text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-blue-500 text-gray-600 dark:text-gray-300 w-full"
+                <TextInput
+                  style={styles.editInput}
+                  defaultValue={userInfo.email}
                   placeholder="Email Address"
+                  keyboardType="email-address"
+                  placeholderTextColor="#9CA3AF"
                 />
-              </div>
+              </View>
             ) : (
-              <div>
-                <h4 className="text-lg font-medium dark:text-white">{userInfo.name}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{userInfo.email}</p>
-                <div className="flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  <span className="flex items-center space-x-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>{userInfo.age}</span>
-                  </span>
-                  <span>•</span>
-                  <span>{userInfo.joinDate}</span>
-                  <span>•</span>
-                  <span className="text-blue-600 dark:text-blue-400">{userInfo.membershipTier}</span>
-                </div>
-              </div>
+              <>
+                <Text style={styles.userName}>{userInfo.name}</Text>
+                <Text style={styles.userEmail}>{userInfo.email}</Text>
+                <View style={styles.userMeta}>
+                  <View style={styles.metaItem}>
+                    <Icon name="calendar" size={12} color="#6B7280" />
+                    <Text style={styles.metaText}>{userInfo.age}</Text>
+                  </View>
+                  <Text style={styles.metaDot}>•</Text>
+                  <Text style={styles.metaText}>{userInfo.joinDate}</Text>
+                  <Text style={styles.metaDot}>•</Text>
+                  <Text style={styles.premiumText}>{userInfo.membershipTier}</Text>
+                </View>
+              </>
             )}
-          </div>
-        </div>
-      </Card>
+          </View>
+        </View>
+      </LinearGradient>
 
-      {/* Connected Device - Enhanced with Better Status */}
-      <Card className="p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium flex items-center dark:text-white">
-            <Wifi className="w-4 h-4 mr-2 text-green-600" />
-            Connected Device
-          </h3>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-xs font-medium">
-              {deviceInfo.connectionStatus}
-            </Badge>
-          </div>
-        </div>
+      {/* Connected Device */}
+      <View style={[styles.card, styles.deviceCard]}>
+        <View style={styles.deviceHeader}>
+          <View style={styles.deviceTitle}>
+            <Icon name="wifi" size={16} color="#10B981" />
+            <Text style={styles.deviceTitleText}>Connected Device</Text>
+          </View>
+          <View style={styles.deviceStatus}>
+            <View style={styles.statusDot} />
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusBadgeText}>{deviceInfo.connectionStatus}</Text>
+            </View>
+          </View>
+        </View>
         
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center shadow-sm">
-            <span className="text-white dark:text-black text-xs font-medium">ITT</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium dark:text-white">{deviceInfo.model}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">SN: {deviceInfo.serialNumber}</p>
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-300">
-                <Battery className="w-3 h-3 text-green-600" />
-                <span>{deviceInfo.batteryLevel}</span>
-              </div>
-              <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-300">
-                <Clock className="w-3 h-3 text-blue-600" />
-                <span>{deviceInfo.lastSync}</span>
-              </div>
-              <div className="text-gray-600 dark:text-gray-300">
-                <span>v{deviceInfo.firmwareVersion}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
+        <View style={styles.deviceContent}>
+          <View style={styles.deviceLogo}>
+            <Text style={styles.deviceLogoText}>ITT</Text>
+          </View>
+          <View style={styles.deviceInfo}>
+            <Text style={styles.deviceModel}>{deviceInfo.model}</Text>
+            <Text style={styles.deviceSerial}>SN: {deviceInfo.serialNumber}</Text>
+            <View style={styles.deviceStats}>
+              <View style={styles.deviceStat}>
+                <Icon name="battery" size={12} color="#10B981" />
+                <Text style={styles.deviceStatText}>{deviceInfo.batteryLevel}</Text>
+              </View>
+              <View style={styles.deviceStat}>
+                <Icon name="clock-outline" size={12} color="#3B82F6" />
+                <Text style={styles.deviceStatText}>{deviceInfo.lastSync}</Text>
+              </View>
+              <Text style={styles.deviceStatText}>{deviceInfo.firmwareVersion}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
 
-      {/* Therapy Preferences - Enhanced */}
-      <Card className="p-3 flex-1 dark:bg-gray-800 dark:border-gray-700">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm flex items-center dark:text-white">
-            <Settings className="w-4 h-4 mr-1 text-purple-600" />
-            Therapy Preferences
-          </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate('settings')}
-            className="text-xs text-blue-600 dark:text-blue-400 dark:hover:bg-gray-700"
-          >
-            Customize
-          </Button>
-        </div>
+      {/* Therapy Preferences */}
+      <View style={styles.card}>
+        <View style={styles.preferencesHeader}>
+          <View style={styles.preferencesTitle}>
+            <Icon name="cog" size={16} color="#8B5CF6" />
+            <Text style={styles.preferencesTitleText}>Therapy Preferences</Text>
+          </View>
+          <TouchableOpacity onPress={() => onNavigate('settings')}>
+            <Text style={styles.customizeText}>Customize</Text>
+          </TouchableOpacity>
+        </View>
         
-        <div className="space-y-3">
-          {therapyPreferences.slice(0, 4).map((pref, index) => (
-            <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer transition-colors">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-300">{pref.label}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <span className="text-sm dark:text-white">{pref.value}</span>
-                {pref.editable && <ChevronRight className="w-3 h-3 text-gray-400" />}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+        {therapyPreferences.map((pref, index) => (
+          <TouchableOpacity key={index} style={styles.preferenceItem}>
+            <View style={styles.preferenceLeft}>
+              <View style={styles.prefDot} />
+              <Text style={styles.preferenceLabel}>{pref.label}</Text>
+            </View>
+            <View style={styles.preferenceRight}>
+              <Text style={styles.preferenceValue}>{pref.value}</Text>
+              {pref.editable && <Icon name="chevron-right" size={14} color="#9CA3AF" />}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      {/* Quick Settings Row */}
-      <div className="grid grid-cols-2 gap-2">
-        <Card className="p-3 dark:bg-gray-800 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-sm dark:text-white">Notifications</h4>
-              <p className="text-xs text-gray-600 dark:text-gray-300">Push alerts</p>
-            </div>
-            <Switch
-              checked={true}
-              onCheckedChange={() => {}}
-            />
-          </div>
-        </Card>
+      {/* Quick Settings */}
+      <View style={styles.quickSettingsRow}>
+        <View style={styles.quickSettingCard}>
+          <View>
+            <Text style={styles.quickSettingTitle}>Notifications</Text>
+            <Text style={styles.quickSettingDesc}>Push alerts</Text>
+          </View>
+          <Switch
+            value={notifications}
+            onValueChange={setNotifications}
+            trackColor={{ false: '#D1D5DB', true: '#FCA5A5' }}
+            thumbColor={notifications ? '#EF4444' : '#F3F4F6'}
+          />
+        </View>
         
-        <Card className="p-3 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-sm text-blue-800 dark:text-blue-300">Data Sharing</h4>
-              <p className="text-xs text-blue-700 dark:text-blue-400">Help improve AI</p>
-            </div>
-            <Switch
-              checked={dataSharing}
-              onCheckedChange={setDataSharing}
-            />
-          </div>
-        </Card>
-      </div>
+        <View style={[styles.quickSettingCard, styles.dataSharingCard]}>
+          <View>
+            <Text style={styles.dataSharingTitle}>Data Sharing</Text>
+            <Text style={styles.dataSharingDesc}>Help improve AI</Text>
+          </View>
+          <Switch
+            value={dataSharing}
+            onValueChange={setDataSharing}
+            trackColor={{ false: '#BFDBFE', true: '#93C5FD' }}
+            thumbColor={dataSharing ? '#3B82F6' : '#EFF6FF'}
+          />
+        </View>
+      </View>
 
       {/* Account Management */}
-      <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="text-sm font-medium dark:text-white mb-3">Account Management</h3>
-        <div className="space-y-3">
-          <Button 
-            variant="outline"
-            className="w-full justify-start border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Privacy Settings
-          </Button>
-          <Button 
-            variant="outline"
-            className="w-full justify-start border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            Security
-          </Button>
-          <Button 
-            variant="outline"
-            className="w-full justify-start border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <Bell className="w-4 h-4 mr-2" />
-            Notification Preferences
-          </Button>
-        </div>
-      </Card>
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Account Management</Text>
+        {[
+          { icon: 'cog', label: 'Privacy Settings' },
+          { icon: 'shield-check', label: 'Security' },
+          { icon: 'bell-outline', label: 'Notification Preferences' }
+        ].map((item, index) => (
+          <TouchableOpacity key={index} style={styles.menuButton}>
+            <Icon name={item.icon} size={18} color="#6B7280" />
+            <Text style={styles.menuButtonText}>{item.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       {/* Support & Help */}
-      <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="text-sm font-medium dark:text-white mb-3">Support & Help</h3>
-        <div className="space-y-3">
-          <Button 
-            variant="ghost"
-            className="w-full justify-start text-gray-700 dark:text-gray-300 rounded-lg py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            Help Center
-          </Button>
-          <Button 
-            variant="ghost"
-            className="w-full justify-start text-gray-700 dark:text-gray-300 rounded-lg py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            Contact Support
-          </Button>
-          <Button 
-            variant="ghost"
-            className="w-full justify-start text-gray-700 dark:text-gray-300 rounded-lg py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            Device Manual
-          </Button>
-        </div>
-      </Card>
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Support & Help</Text>
+        {['Help Center', 'Contact Support', 'Device Manual'].map((item, index) => (
+          <TouchableOpacity key={index} style={styles.helpButton}>
+            <Text style={styles.helpButtonText}>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       {/* Account Actions */}
-      <div className="grid grid-cols-2 gap-2">
-        <Button 
-          variant="outline"
-          className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-full py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
-        >
-          Export Data
-        </Button>
-        
-        <Button 
-          variant="outline"
-          className="border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded-full py-3 hover:bg-red-50 dark:hover:bg-red-900/20"
-        >
-          Sign Out
-        </Button>
-      </div>
-    </div>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity style={styles.exportButton}>
+          <Text style={styles.exportButtonText}>Export Data</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signOutButton}>
+          <Text style={styles.signOutButtonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  contentContainer: {
+    padding: 16,
+    paddingTop: 50,
+    paddingBottom: 100,
+    gap: 16,
+  },
+  profileCard: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  editButtonText: {
+    fontSize: 14,
+    color: '#3B82F6',
+    fontWeight: '500',
+  },
+  profileContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  editForm: {
+    gap: 12,
+  },
+  editInput: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: '#111827',
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  userMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    flexWrap: 'wrap',
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaText: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  metaDot: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginHorizontal: 6,
+  },
+  premiumText: {
+    fontSize: 12,
+    color: '#3B82F6',
+    fontWeight: '500',
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  deviceCard: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#A7F3D0',
+  },
+  deviceHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  deviceTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deviceTitleText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  deviceStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#10B981',
+  },
+  statusBadge: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusBadgeText: {
+    fontSize: 12,
+    color: '#047857',
+    fontWeight: '500',
+  },
+  deviceContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  deviceLogo: {
+    width: 48,
+    height: 32,
+    backgroundColor: '#111827',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deviceLogoText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  deviceInfo: {
+    flex: 1,
+  },
+  deviceModel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  deviceSerial: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  deviceStats: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  deviceStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  deviceStatText: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  preferencesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  preferencesTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  preferencesTitleText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  customizeText: {
+    fontSize: 13,
+    color: '#3B82F6',
+    fontWeight: '500',
+  },
+  preferenceItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
+  preferenceLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  prefDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#3B82F6',
+  },
+  preferenceLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  preferenceRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  preferenceValue: {
+    fontSize: 14,
+    color: '#111827',
+  },
+  quickSettingsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  quickSettingCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  quickSettingTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  quickSettingDesc: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  dataSharingCard: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+  },
+  dataSharingTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1E40AF',
+  },
+  dataSharingDesc: {
+    fontSize: 12,
+    color: '#3B82F6',
+    marginTop: 2,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  menuButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  menuButtonText: {
+    fontSize: 14,
+    color: '#374151',
+  },
+  helpButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+  },
+  helpButtonText: {
+    fontSize: 14,
+    color: '#374151',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  exportButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    alignItems: 'center',
+  },
+  exportButtonText: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  signOutButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    alignItems: 'center',
+  },
+  signOutButtonText: {
+    fontSize: 14,
+    color: '#DC2626',
+    fontWeight: '500',
+  },
+});

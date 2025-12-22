@@ -18,6 +18,7 @@ import GoalsScreen from '../screens/GoalsScreen';
 import SetupCompleteScreen from '../screens/SetupCompleteScreen';
 import DeviceConnectionScreen from '../screens/DeviceConnectionScreen';
 import ConnectionSuccessScreen from '../screens/ConnectionSuccessScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 // Main App
 import { MainTabNavigator } from './MainTabNavigator';
@@ -29,6 +30,7 @@ export type RootStackParamList = {
   OTP: { email: string };
   ProfileType: undefined;
   ProfileDetails: { profileType: 'athlete' | 'health' | 'coach' };
+  Profile: undefined;
   Interests: { profileType: 'athlete' | 'health' | 'coach' };
   BasicInfo: undefined;
   MedicalHistory: { weightKg?: number; heightCm?: number } | undefined;
@@ -77,6 +79,7 @@ export const AppNavigator = () => {
         <Stack.Screen name="ConnectionSuccess" component={ConnectionSuccessScreen} />
         <Stack.Screen name="SetupComplete" component={SetupCompleteScreen} />
         <Stack.Screen name="MainApp" component={MainTabNavigator} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
         <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
         <Stack.Screen name="Goals" component={GoalsScreen} />

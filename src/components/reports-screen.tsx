@@ -102,7 +102,7 @@ export function ReportsScreen({ onNavigate }: ReportsScreenProps) {
   };
 
   return (
-    <div className="min-h-full p-4 space-y-4 pb-8">
+    <div className="min-h-full p-4 space-y-4 pb-8 safe-top">
       {/* Stats Overview - Compact */}
       <div className="grid grid-cols-3 gap-2">
         {progressStats.map((stat, index) => (

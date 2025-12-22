@@ -151,7 +151,7 @@ export function CoachHomeScreen({ userName, coachType }: CoachHomeScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 pb-24">
+    <div className="min-h-screen bg-gray-50 p-6 pb-24 safe-top">
       {/* Minimalist Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

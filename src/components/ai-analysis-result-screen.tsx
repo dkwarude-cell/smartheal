@@ -49,7 +49,7 @@ export function AIAnalysisResultScreen({ onNavigate, imageData }: AIAnalysisResu
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20 p-4">
+    <div className="min-h-full bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20 p-4 safe-top">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 pt-2">
         <Button

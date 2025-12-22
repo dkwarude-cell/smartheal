@@ -93,7 +93,7 @@ export function AIAssistantTab({ user, onShowVoice }: AIAssistantTabProps) {
   };
 
   return (
-    <div className="px-4 py-6 space-y-6 pb-24 max-h-screen overflow-hidden flex flex-col">
+    <div className="px-4 space-y-6 pb-24 max-h-screen overflow-hidden flex flex-col safe-top">
       {/* Header */}
       <div className="text-center">
         <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">

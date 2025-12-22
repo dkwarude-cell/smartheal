@@ -371,7 +371,7 @@ export function MainApp({ user, isDeviceConnected, onDeviceConnection, onUserUpd
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 safe-top">
       {renderActiveScreen()}
 
       {/* Voice Assistant Overlay */}

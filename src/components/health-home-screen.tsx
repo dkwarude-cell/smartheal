@@ -64,7 +64,7 @@ export function HealthHomeScreen({ userName, ageGroup, goal }: HealthHomeScreenP
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6 safe-top">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

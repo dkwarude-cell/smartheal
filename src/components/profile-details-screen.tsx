@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { ArrowRight, ChevronRight, Heart } from 'lucide-react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ProfileDetailsScreenProps {
   onNavigate: (state: string) => void;
@@ -75,132 +76,207 @@ export function ProfileDetailsScreen({ onNavigate, onUserUpdate, user }: Profile
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl">
+    <LinearGradient colors={['#FEF2F2', '#FFFFFF', '#FFF7ED']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="w-16 h-16 bg-red-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-            <Heart className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-gray-900 mb-3">{config.title}</h1>
-          <p className="text-gray-600">Help us personalize your experience</p>
-        </motion.div>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <Icon name="heart" size={32} color="#FFFFFF" />
+          </View>
+          <Text style={styles.title}>{config.title}</Text>
+          <Text style={styles.subtitle}>Help us personalize your experience</Text>
+        </View>
 
         {/* Primary Options */}
-        <div className="space-y-4 mb-8">
-          {config.options.map((option, index) => (
-            <motion.button
+        <View style={styles.optionsContainer}>
+          {config.options.map((option) => (
+            <TouchableOpacity
               key={option.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              onClick={() => setSelectedOption(option.id)}
-              className={`w-full bg-white rounded-xl p-6 text-left transition-all duration-300 shadow-md border-2 ${
-                selectedOption === option.id
-                  ? 'border-red-500 shadow-red-100'
-                  : 'border-gray-100 hover:border-red-200 hover:shadow-lg'
-              }`}
+              onPress={() => setSelectedOption(option.id)}
+              style={[
+                styles.optionCard,
+                selectedOption === option.id && styles.optionCardSelected
+              ]}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h3 className="text-gray-900 mb-1">{option.title}</h3>
-                  <p className="text-gray-600 text-sm">{option.description}</p>
-                </div>
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                  selectedOption === option.id
-                    ? 'border-red-500 bg-red-500'
-                    : 'border-gray-300'
-                }`}>
-                  {selectedOption === option.id && (
-                    <motion.svg
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </motion.svg>
-                  )}
-                </div>
-              </div>
-            </motion.button>
+              <View style={styles.optionContent}>
+                <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionDescription}>{option.description}</Text>
+              </View>
+              <View style={[
+                styles.radioCircle,
+                selectedOption === option.id && styles.radioCircleSelected
+              ]}>
+                {selectedOption === option.id && (
+                  <Icon name="check" size={14} color="#FFFFFF" />
+                )}
+              </View>
+            </TouchableOpacity>
           ))}
-        </div>
+        </View>
 
         {/* Secondary Options (for health profile) */}
         {config.showSecondary && selectedOption && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <h2 className="text-gray-900 mb-4">{config.secondaryTitle}</h2>
-            <div className="space-y-4">
-              {config.secondaryOptions?.map((option, index) => (
-                <motion.button
+          <View style={styles.secondarySection}>
+            <Text style={styles.secondaryTitle}>{config.secondaryTitle}</Text>
+            <View style={styles.optionsContainer}>
+              {config.secondaryOptions?.map((option) => (
+                <TouchableOpacity
                   key={option.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  onClick={() => setSecondaryOption(option.id)}
-                  className={`w-full bg-white rounded-xl p-5 text-left transition-all duration-300 shadow-md border-2 ${
-                    secondaryOption === option.id
-                      ? 'border-red-500 shadow-red-100'
-                      : 'border-gray-100 hover:border-red-200 hover:shadow-lg'
-                  }`}
+                  onPress={() => setSecondaryOption(option.id)}
+                  style={[
+                    styles.optionCard,
+                    secondaryOption === option.id && styles.optionCardSelected
+                  ]}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-gray-900 mb-1">{option.title}</h4>
-                      <p className="text-gray-600 text-sm">{option.description}</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                      secondaryOption === option.id
-                        ? 'border-red-500 bg-red-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {secondaryOption === option.id && (
-                        <motion.svg
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="w-4 h-4 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </motion.svg>
-                      )}
-                    </div>
-                  </div>
-                </motion.button>
+                  <View style={styles.optionContent}>
+                    <Text style={styles.optionTitle}>{option.title}</Text>
+                    <Text style={styles.optionDescription}>{option.description}</Text>
+                  </View>
+                  <View style={[
+                    styles.radioCircle,
+                    secondaryOption === option.id && styles.radioCircleSelected
+                  ]}>
+                    {secondaryOption === option.id && (
+                      <Icon name="check" size={14} color="#FFFFFF" />
+                    )}
+                  </View>
+                </TouchableOpacity>
               ))}
-            </div>
-          </motion.div>
+            </View>
+          </View>
         )}
 
         {/* Continue Button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: canContinue ? 1 : 0.5 }}
-          onClick={handleContinue}
+        <TouchableOpacity
+          onPress={handleContinue}
           disabled={!canContinue}
-          className={`w-full bg-gradient-to-r from-red-500 to-orange-500 text-white py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${
-            canContinue
-              ? 'hover:shadow-xl hover:scale-102'
-              : 'cursor-not-allowed'
-          }`}
+          style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}
         >
-          <span>Continue</span>
-          <ArrowRight className="w-5 h-5" />
-        </motion.button>
-      </div>
-    </div>
+          <LinearGradient
+            colors={canContinue ? ['#EF4444', '#F97316'] : ['#D1D5DB', '#9CA3AF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.continueGradient}
+          >
+            <Text style={styles.continueText}>Continue</Text>
+            <Icon name="arrow-right" size={20} color="#FFFFFF" />
+          </LinearGradient>
+        </TouchableOpacity>
+      </ScrollView>
+    </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 24,
+    paddingTop: 60,
+    paddingBottom: 40,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  optionsContainer: {
+    gap: 16,
+    marginBottom: 24,
+  },
+  optionCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#F3F4F6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  optionCardSelected: {
+    borderColor: '#EF4444',
+    shadowColor: '#EF4444',
+    shadowOpacity: 0.15,
+  },
+  optionContent: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  optionDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioCircleSelected: {
+    borderColor: '#EF4444',
+    backgroundColor: '#EF4444',
+  },
+  secondarySection: {
+    marginTop: 8,
+  },
+  secondaryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 16,
+  },
+  continueButton: {
+    marginTop: 8,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  continueButtonDisabled: {
+    opacity: 0.5,
+  },
+  continueGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  continueText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+});

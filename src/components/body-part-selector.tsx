@@ -94,7 +94,7 @@ export function BodyPartSelector({ onNext, onSkip }: BodyPartSelectorProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col safe-top">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">

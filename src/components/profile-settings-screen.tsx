@@ -1,29 +1,6 @@
 import React, { useState } from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Badge } from './ui/badge';
-import { 
-  ArrowLeft, 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar,
-  Ruler,
-  Weight,
-  Heart,
-  Activity,
-  AlertCircle,
-  Edit2,
-  Camera,
-  Save,
-  X,
-  Plus,
-  Trash2
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, StyleSheet, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ProfileSettingsScreenProps {
   user: any;
@@ -57,18 +34,16 @@ export function ProfileSettingsScreen({ user, onBack, onUpdate }: ProfileSetting
   };
 
   const handleSave = () => {
-    // Validate required fields
     if (!formData.name || !formData.email) {
-      toast.error('Please fill in all required fields');
+      Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
 
-    // Call update callback
     if (onUpdate) {
       onUpdate({ ...formData, medicalConditions });
     }
 
-    toast.success('Profile updated successfully');
+    Alert.alert('Success', 'Profile updated successfully');
     setIsEditing(false);
   };
 
@@ -101,320 +76,539 @@ export function ProfileSettingsScreen({ user, onBack, onUpdate }: ProfileSetting
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <View style={styles.container}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={onBack} className="p-2">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-xl font-semibold">Profile Settings</h1>
-          </div>
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={onBack} style={styles.backButton}>
+            <Icon name="arrow-left" size={22} color="#374151" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profile Settings</Text>
+        </View>
 
-          {!isEditing ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              className="text-blue-600 hover:text-blue-700"
-            >
-              <Edit2 className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCancel}
-                className="text-gray-600"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleSave}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+        {!isEditing ? (
+          <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.editButton}>
+            <Icon name="pencil" size={18} color="#3B82F6" />
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
+              <Icon name="close" size={20} color="#6B7280" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+              <Icon name="content-save" size={18} color="#FFFFFF" />
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
 
-      <div className="p-4 space-y-6 pb-24">
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {/* Profile Picture */}
-        <Card className="p-6">
-          <div className="flex flex-col items-center">
-            <div className="relative">
-              <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center">
-                <User className="w-12 h-12 text-red-600" />
-              </div>
+        <View style={styles.card}>
+          <View style={styles.profilePictureSection}>
+            <View style={styles.avatarContainer}>
+              <View style={styles.avatar}>
+                <Icon name="account" size={48} color="#EF4444" />
+              </View>
               {isEditing && (
-                <Button
-                  size="sm"
-                  className="absolute bottom-0 right-0 rounded-full w-8 h-8 p-0 bg-red-500 hover:bg-red-600"
-                >
-                  <Camera className="w-4 h-4" />
-                </Button>
+                <TouchableOpacity style={styles.cameraButton}>
+                  <Icon name="camera" size={16} color="#FFFFFF" />
+                </TouchableOpacity>
               )}
-            </div>
-            <h2 className="mt-4 font-semibold text-gray-900">{formData.name || 'User'}</h2>
-            <p className="text-sm text-gray-500">{formData.email}</p>
-          </div>
-        </Card>
+            </View>
+            <Text style={styles.userName}>{formData.name || 'User'}</Text>
+            <Text style={styles.userEmail}>{formData.email}</Text>
+          </View>
+        </View>
 
         {/* Personal Information */}
-        <Card className="p-4">
-          <h2 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <User className="w-5 h-5 text-red-500" />
-            <span>Personal Information</span>
-          </h2>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Icon name="account" size={20} color="#EF4444" />
+            <Text style={styles.cardTitle}>Personal Information</Text>
+          </View>
 
-          <div className="space-y-4">
-            <div>
-              <Label>Full Name *</Label>
-              <Input
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                disabled={!isEditing}
-                placeholder="Enter your full name"
-                className="mt-1"
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Full Name *</Text>
+            <TextInput
+              style={[styles.input, !isEditing && styles.inputDisabled]}
+              value={formData.name}
+              onChangeText={(value) => handleInputChange('name', value)}
+              editable={isEditing}
+              placeholder="Enter your full name"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Email *</Text>
+            <TextInput
+              style={[styles.input, !isEditing && styles.inputDisabled]}
+              value={formData.email}
+              onChangeText={(value) => handleInputChange('email', value)}
+              editable={isEditing}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput
+              style={[styles.input, !isEditing && styles.inputDisabled]}
+              value={formData.phone}
+              onChangeText={(value) => handleInputChange('phone', value)}
+              editable={isEditing}
+              placeholder="Enter your phone number"
+              keyboardType="phone-pad"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          <View style={styles.row}>
+            <View style={[styles.formGroup, { flex: 1 }]}>
+              <Text style={styles.label}>Age</Text>
+              <TextInput
+                style={[styles.input, !isEditing && styles.inputDisabled]}
+                value={formData.age}
+                onChangeText={(value) => handleInputChange('age', value)}
+                editable={isEditing}
+                placeholder="Age"
+                keyboardType="numeric"
+                placeholderTextColor="#9CA3AF"
               />
-            </div>
-
-            <div>
-              <Label>Email *</Label>
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                disabled={!isEditing}
-                placeholder="Enter your email"
-                className="mt-1"
+            </View>
+            <View style={[styles.formGroup, { flex: 1, marginLeft: 12 }]}>
+              <Text style={styles.label}>Gender</Text>
+              <TextInput
+                style={[styles.input, !isEditing && styles.inputDisabled]}
+                value={formData.gender}
+                onChangeText={(value) => handleInputChange('gender', value)}
+                editable={isEditing}
+                placeholder="Gender"
+                placeholderTextColor="#9CA3AF"
               />
-            </div>
-
-            <div>
-              <Label>Phone Number</Label>
-              <Input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                disabled={!isEditing}
-                placeholder="Enter your phone number"
-                className="mt-1"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Age</Label>
-                <Input
-                  type="number"
-                  value={formData.age}
-                  onChange={(e) => handleInputChange('age', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="Age"
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label>Gender</Label>
-                <Input
-                  value={formData.gender}
-                  onChange={(e) => handleInputChange('gender', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="Gender"
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
+            </View>
+          </View>
+        </View>
 
         {/* Health Information */}
-        <Card className="p-4">
-          <h2 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <Heart className="w-5 h-5 text-red-500" />
-            <span>Health Information</span>
-          </h2>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Icon name="heart" size={20} color="#EF4444" />
+            <Text style={styles.cardTitle}>Health Information</Text>
+          </View>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="flex items-center space-x-2">
-                  <Ruler className="w-4 h-4" />
-                  <span>Height (cm)</span>
-                </Label>
-                <Input
-                  type="number"
-                  value={formData.height}
-                  onChange={(e) => handleInputChange('height', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="175"
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label className="flex items-center space-x-2">
-                  <Weight className="w-4 h-4" />
-                  <span>Weight (kg)</span>
-                </Label>
-                <Input
-                  type="number"
-                  value={formData.weight}
-                  onChange={(e) => handleInputChange('weight', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="70"
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label>Blood Type</Label>
-              <Input
-                value={formData.bloodType}
-                onChange={(e) => handleInputChange('bloodType', e.target.value)}
-                disabled={!isEditing}
-                placeholder="O+"
-                className="mt-1"
+          <View style={styles.row}>
+            <View style={[styles.formGroup, { flex: 1 }]}>
+              <Text style={styles.label}>Height (cm)</Text>
+              <TextInput
+                style={[styles.input, !isEditing && styles.inputDisabled]}
+                value={formData.height}
+                onChangeText={(value) => handleInputChange('height', value)}
+                editable={isEditing}
+                placeholder="175"
+                keyboardType="numeric"
+                placeholderTextColor="#9CA3AF"
               />
-            </div>
-
-            {/* Medical Conditions */}
-            <div>
-              <Label className="flex items-center space-x-2 mb-2">
-                <Activity className="w-4 h-4" />
-                <span>Medical Conditions</span>
-              </Label>
-              
-              <div className="flex flex-wrap gap-2 mb-3">
-                {medicalConditions.map((condition, index) => (
-                  <Badge key={index} variant="secondary" className="py-1 px-3">
-                    {condition}
-                    {isEditing && (
-                      <button
-                        onClick={() => removeMedicalCondition(index)}
-                        className="ml-2 text-red-600 hover:text-red-700"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    )}
-                  </Badge>
-                ))}
-              </div>
-
-              {isEditing && (
-                <div className="flex items-center space-x-2">
-                  <Input
-                    value={newCondition}
-                    onChange={(e) => setNewCondition(e.target.value)}
-                    placeholder="Add medical condition"
-                    onKeyPress={(e) => e.key === 'Enter' && addMedicalCondition()}
-                  />
-                  <Button
-                    size="sm"
-                    onClick={addMedicalCondition}
-                    variant="outline"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <Label>Medical Notes</Label>
-              <Textarea
-                value={formData.medicalNotes}
-                onChange={(e) => handleInputChange('medicalNotes', e.target.value)}
-                disabled={!isEditing}
-                placeholder="Any important medical information or allergies..."
-                className="mt-1 min-h-[100px]"
+            </View>
+            <View style={[styles.formGroup, { flex: 1, marginLeft: 12 }]}>
+              <Text style={styles.label}>Weight (kg)</Text>
+              <TextInput
+                style={[styles.input, !isEditing && styles.inputDisabled]}
+                value={formData.weight}
+                onChangeText={(value) => handleInputChange('weight', value)}
+                editable={isEditing}
+                placeholder="70"
+                keyboardType="numeric"
+                placeholderTextColor="#9CA3AF"
               />
-            </div>
-          </div>
-        </Card>
+            </View>
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Blood Type</Text>
+            <TextInput
+              style={[styles.input, !isEditing && styles.inputDisabled]}
+              value={formData.bloodType}
+              onChangeText={(value) => handleInputChange('bloodType', value)}
+              editable={isEditing}
+              placeholder="O+"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Medical Conditions */}
+          <View style={styles.formGroup}>
+            <View style={styles.labelRow}>
+              <Icon name="clipboard-pulse" size={16} color="#6B7280" />
+              <Text style={styles.label}>Medical Conditions</Text>
+            </View>
+            
+            <View style={styles.badgesContainer}>
+              {medicalConditions.map((condition, index) => (
+                <View key={index} style={styles.badge}>
+                  <Text style={styles.badgeText}>{condition}</Text>
+                  {isEditing && (
+                    <TouchableOpacity onPress={() => removeMedicalCondition(index)}>
+                      <Icon name="close" size={14} color="#EF4444" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </View>
+
+            {isEditing && (
+              <View style={styles.addConditionRow}>
+                <TextInput
+                  style={[styles.input, { flex: 1 }]}
+                  value={newCondition}
+                  onChangeText={setNewCondition}
+                  placeholder="Add medical condition"
+                  placeholderTextColor="#9CA3AF"
+                  onSubmitEditing={addMedicalCondition}
+                />
+                <TouchableOpacity onPress={addMedicalCondition} style={styles.addButton}>
+                  <Icon name="plus" size={20} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Medical Notes</Text>
+            <TextInput
+              style={[styles.textArea, !isEditing && styles.inputDisabled]}
+              value={formData.medicalNotes}
+              onChangeText={(value) => handleInputChange('medicalNotes', value)}
+              editable={isEditing}
+              placeholder="Any important medical information or allergies..."
+              placeholderTextColor="#9CA3AF"
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          </View>
+        </View>
 
         {/* Emergency Contact */}
-        <Card className="p-4">
-          <h2 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            <span>Emergency Contact</span>
-          </h2>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Icon name="alert-circle" size={20} color="#EF4444" />
+            <Text style={styles.cardTitle}>Emergency Contact</Text>
+          </View>
 
-          <div className="space-y-4">
-            <div>
-              <Label>Contact Name</Label>
-              <Input
-                value={formData.emergencyContact}
-                onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
-                disabled={!isEditing}
-                placeholder="Emergency contact name"
-                className="mt-1"
-              />
-            </div>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Contact Name</Text>
+            <TextInput
+              style={[styles.input, !isEditing && styles.inputDisabled]}
+              value={formData.emergencyContact}
+              onChangeText={(value) => handleInputChange('emergencyContact', value)}
+              editable={isEditing}
+              placeholder="Emergency contact name"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
 
-            <div>
-              <Label>Contact Phone</Label>
-              <Input
-                type="tel"
-                value={formData.emergencyPhone}
-                onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-                disabled={!isEditing}
-                placeholder="Emergency contact phone"
-                className="mt-1"
-              />
-            </div>
-          </div>
-        </Card>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Contact Phone</Text>
+            <TextInput
+              style={[styles.input, !isEditing && styles.inputDisabled]}
+              value={formData.emergencyPhone}
+              onChangeText={(value) => handleInputChange('emergencyPhone', value)}
+              editable={isEditing}
+              placeholder="Emergency contact phone"
+              keyboardType="phone-pad"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+        </View>
 
         {/* Account Stats */}
-        <Card className="p-4">
-          <h2 className="font-semibold text-gray-900 mb-4">Account Statistics</h2>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Account Statistics</Text>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-2xl font-semibold text-red-600">42</p>
-              <p className="text-xs text-gray-600">Total Sessions</p>
-            </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-2xl font-semibold text-blue-600">8</p>
-              <p className="text-xs text-gray-600">Week Streak</p>
-            </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-2xl font-semibold text-green-600">87%</p>
-              <p className="text-xs text-gray-600">Recovery Rate</p>
-            </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-2xl font-semibold text-purple-600">24h</p>
-              <p className="text-xs text-gray-600">Total Time</p>
-            </div>
-          </div>
-        </Card>
+          <View style={styles.statsGrid}>
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: '#EF4444' }]}>42</Text>
+              <Text style={styles.statLabel}>Total Sessions</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: '#3B82F6' }]}>8</Text>
+              <Text style={styles.statLabel}>Week Streak</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: '#10B981' }]}>87%</Text>
+              <Text style={styles.statLabel}>Recovery Rate</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: '#8B5CF6' }]}>24h</Text>
+              <Text style={styles.statLabel}>Total Time</Text>
+            </View>
+          </View>
+        </View>
 
         {/* Danger Zone */}
         {isEditing && (
-          <Card className="p-4 border-red-200">
-            <h2 className="font-semibold text-red-600 mb-4">Danger Zone</h2>
-            
-            <Button
-              variant="outline"
-              className="w-full text-red-600 border-red-200 hover:bg-red-50"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Account
-            </Button>
-          </Card>
+          <View style={[styles.card, styles.dangerCard]}>
+            <Text style={styles.dangerTitle}>Danger Zone</Text>
+            <TouchableOpacity style={styles.deleteButton}>
+              <Icon name="delete" size={18} color="#EF4444" />
+              <Text style={styles.deleteButtonText}>Delete Account</Text>
+            </TouchableOpacity>
+          </View>
         )}
-      </div>
-    </div>
+      </ScrollView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  header: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  editButtonText: {
+    fontSize: 15,
+    color: '#3B82F6',
+    fontWeight: '500',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cancelButton: {
+    padding: 8,
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  saveButtonText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 100,
+    gap: 16,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  profilePictureSection: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  avatarContainer: {
+    position: 'relative',
+  },
+  avatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginTop: 16,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  formGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#111827',
+  },
+  inputDisabled: {
+    backgroundColor: '#F9FAFB',
+    color: '#6B7280',
+  },
+  textArea: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#111827',
+    minHeight: 100,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  badgesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  badgeText: {
+    fontSize: 13,
+    color: '#374151',
+  },
+  addConditionRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  addButton: {
+    width: 44,
+    height: 44,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 8,
+  },
+  statItem: {
+    width: '47%',
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  dangerCard: {
+    borderColor: '#FECACA',
+  },
+  dangerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#EF4444',
+    marginBottom: 16,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    borderRadius: 10,
+    paddingVertical: 14,
+  },
+  deleteButtonText: {
+    fontSize: 15,
+    color: '#EF4444',
+    fontWeight: '500',
+  },
+});

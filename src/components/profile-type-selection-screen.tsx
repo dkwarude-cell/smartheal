@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { User, Trophy, Heart, ChevronRight } from 'lucide-react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ProfileTypeSelectionScreenProps {
   onNavigate: (state: string) => void;
@@ -13,21 +14,21 @@ const profileTypes = [
     id: 'athlete',
     title: 'Runner / Athlete',
     description: 'Train smarter, recover faster, perform better',
-    icon: Trophy,
+    icon: 'trophy',
     features: ['Performance tracking', 'Training plans', 'Recovery optimization']
   },
   {
     id: 'coach',
     title: 'Coach / Trainer',
     description: 'Manage athletes and optimize their performance',
-    icon: User,
+    icon: 'account',
     features: ['Client management', 'Progress monitoring', 'Treatment planning']
   },
   {
     id: 'health',
     title: 'Health & Wellness',
     description: 'Manage pain, improve mobility, feel better',
-    icon: Heart,
+    icon: 'heart',
     features: ['Pain management', 'Wellness tracking', 'Self-care guidance']
   }
 ];
@@ -44,86 +45,175 @@ export function ProfileTypeSelectionScreen({ onNavigate, onUserUpdate }: Profile
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-4xl">
+    <LinearGradient colors={['#FEF2F2', '#FFFFFF', '#FFF7ED']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="w-16 h-16 bg-red-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-            <Heart className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-gray-900 mb-3">Tell us about yourself</h1>
-          <p className="text-gray-600">We'll customize your SmartHeal experience</p>
-        </motion.div>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <Icon name="heart" size={32} color="#FFFFFF" />
+          </View>
+          <Text style={styles.title}>Tell us about yourself</Text>
+          <Text style={styles.subtitle}>We'll customize your SmartHeal experience</Text>
+        </View>
 
         {/* Profile Type Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {profileTypes.map((type, index) => {
-            const Icon = type.icon;
+        <View style={styles.cardsContainer}>
+          {profileTypes.map((type) => {
             const isSelected = selectedType === type.id;
 
             return (
-              <motion.button
+              <TouchableOpacity
                 key={type.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => handleSelect(type.id)}
-                className={`relative bg-white rounded-2xl p-6 text-left transition-all duration-300 shadow-lg border-2 ${
-                  isSelected
-                    ? 'border-red-500 shadow-red-100 scale-105'
-                    : 'border-gray-100 hover:border-red-200 hover:shadow-xl'
-                }`}
+                onPress={() => handleSelect(type.id)}
+                style={[
+                  styles.typeCard,
+                  isSelected && styles.typeCardSelected
+                ]}
               >
+                {/* Selected Indicator */}
+                {isSelected && (
+                  <View style={styles.selectedBadge}>
+                    <Icon name="check" size={14} color="#FFFFFF" />
+                  </View>
+                )}
+
                 {/* Icon */}
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 p-4 mb-4 flex items-center justify-center">
-                  <Icon className="w-8 h-8 text-white" />
-                </div>
+                <LinearGradient
+                  colors={['#EF4444', '#F97316']}
+                  style={styles.typeIcon}
+                >
+                  <Icon name={type.icon} size={28} color="#FFFFFF" />
+                </LinearGradient>
 
                 {/* Content */}
-                <h3 className="text-gray-900 mb-2">{type.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{type.description}</p>
+                <Text style={styles.typeTitle}>{type.title}</Text>
+                <Text style={styles.typeDescription}>{type.description}</Text>
 
                 {/* Features */}
-                <ul className="space-y-2 mb-4">
+                <View style={styles.features}>
                   {type.features.map((feature, idx) => (
-                    <li key={idx} className="text-gray-500 text-sm flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
+                    <View key={idx} style={styles.featureRow}>
+                      <Icon name="chevron-right" size={16} color="#EF4444" />
+                      <Text style={styles.featureText}>{feature}</Text>
+                    </View>
                   ))}
-                </ul>
-
-                {/* Selected indicator */}
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-4 right-4 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center"
-                  >
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </motion.div>
-                )}
-              </motion.button>
+                </View>
+              </TouchableOpacity>
             );
           })}
-        </div>
+        </View>
 
         {/* Footer */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-center text-gray-500 text-sm"
-        >
+        <Text style={styles.footerText}>
           You can change this later in settings
-        </motion.p>
-      </div>
-    </div>
+        </Text>
+      </ScrollView>
+    </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 24,
+    paddingTop: 60,
+    paddingBottom: 40,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  cardsContainer: {
+    gap: 20,
+    marginBottom: 24,
+  },
+  typeCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: '#F3F4F6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    position: 'relative',
+  },
+  typeCardSelected: {
+    borderColor: '#EF4444',
+    transform: [{ scale: 1.02 }],
+    shadowColor: '#EF4444',
+    shadowOpacity: 0.15,
+  },
+  selectedBadge: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  typeIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  typeTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
+  },
+  typeDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 16,
+  },
+  features: {
+    gap: 8,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  featureText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+  },
+});

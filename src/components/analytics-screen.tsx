@@ -70,7 +70,7 @@ export function AnalyticsScreen({ user, onBack }: AnalyticsScreenProps) {
   const maxValue = Math.max(...data.chart.map(d => d.value));
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24 safe-top">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40 px-4 py-4">
         <button

@@ -71,7 +71,7 @@ export function OTPScreen({ onNavigate, user }: OTPScreenProps) {
     '+1 *** *** ****';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 safe-top">
       {/* Header */}
       <div className="flex items-center justify-between p-6">
         <Button

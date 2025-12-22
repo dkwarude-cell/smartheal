@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Checkbox } from './ui/checkbox';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
-import { ArrowLeft, Heart, User, Calendar, Weight, Ruler, Activity, Target, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ProfileSetupScreenProps {
   onNavigate: (screen: string) => void;
@@ -26,25 +21,25 @@ export function ProfileSetupScreen({ onNavigate, onUserUpdate, user }: ProfileSe
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [showGenderPicker, setShowGenderPicker] = useState(false);
+  const [showActivityPicker, setShowActivityPicker] = useState(false);
   const totalSteps = 3;
 
   const handleInputChange = (field: string, value: string) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleArrayFieldChange = (field: 'medicalConditions' | 'goals', value: string, checked: boolean) => {
+  const handleArrayFieldChange = (field: 'medicalConditions' | 'goals', value: string) => {
     setProfileData(prev => ({
       ...prev,
-      [field]: checked 
-        ? [...prev[field], value]
-        : prev[field].filter(item => item !== value)
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(item => item !== value)
+        : [...prev[field], value]
     }));
   };
 
   const handleComplete = async () => {
     setIsLoading(true);
-    
-    // Simulate API call
     setTimeout(() => {
       onUserUpdate({
         ...profileData,
@@ -57,14 +52,33 @@ export function ProfileSetupScreen({ onNavigate, onUserUpdate, user }: ProfileSe
     }, 1500);
   };
 
+  const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'other', label: 'Other' },
+    { value: 'prefer-not-to-say', label: 'Prefer not to say' }
+  ];
+
+  const activityOptions = [
+    { value: 'sedentary', label: '🪑 Sedentary', desc: 'Little to no exercise' },
+    { value: 'light', label: '🚶 Light', desc: '1-3 days/week' },
+    { value: 'moderate', label: '🏃 Moderate', desc: '3-5 days/week' },
+    { value: 'active', label: '💪 Active', desc: '6-7 days/week' },
+    { value: 'very-active', label: '🔥 Very Active', desc: '2x/day or intense' }
+  ];
+
   const medicalConditionOptions = [
     'Diabetes', 'Hypertension', 'Heart Disease', 'Arthritis', 
     'Back Pain', 'Knee Pain', 'Chronic Pain', 'None'
   ];
 
   const goalOptions = [
-    'Pain Relief', 'Muscle Recovery', 'Improved Mobility', 
-    'Stress Reduction', 'Better Sleep', 'General Wellness'
+    { label: 'Pain Relief', icon: '🎯' },
+    { label: 'Muscle Recovery', icon: '💪' },
+    { label: 'Improved Mobility', icon: '🧘' },
+    { label: 'Stress Reduction', icon: '😌' },
+    { label: 'Better Sleep', icon: '😴' },
+    { label: 'General Wellness', icon: '✨' }
   ];
 
   const progressPercentage = (currentStep / totalSteps) * 100;
@@ -96,332 +110,703 @@ export function ProfileSetupScreen({ onNavigate, onUserUpdate, user }: ProfileSe
     }
   };
 
+  const renderStepIcon = () => {
+    switch (currentStep) {
+      case 1: return 'account';
+      case 2: return 'heart-pulse';
+      case 3: return 'target';
+      default: return 'account';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-pink-50 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-32 h-32 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-20 left-20 w-32 h-32 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
+    <View style={styles.container}>
+      <LinearGradient colors={['#FEF2F2', '#FFF7ED', '#FDF2F8']} style={styles.background}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+            <Icon name="arrow-left" size={20} color="#374151" />
+            <Text style={styles.backText}>Back</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.logo}>
+            <LinearGradient colors={['#EF4444', '#F97316']} style={styles.logoIcon}>
+              <Icon name="heart" size={16} color="#FFFFFF" />
+            </LinearGradient>
+            <Text style={styles.logoText}>SmartHeal</Text>
+          </View>
+        </View>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between p-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleBack}
-          className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:bg-white/50 backdrop-blur-sm"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
-        </Button>
-        
-        <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
-          <div className="w-7 h-7 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center">
-            <Heart className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-bold text-gray-900">SmartHeal</span>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="relative z-10 px-6 mb-6">
-        <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Step {currentStep} of {totalSteps}</span>
-            <span className="text-sm font-medium text-red-500">{Math.round(progressPercentage)}%</span>
-          </div>
-          <div className="h-2 bg-white/50 backdrop-blur-sm rounded-full overflow-hidden shadow-inner">
-            <div 
-              className="h-full bg-gradient-to-r from-red-500 via-orange-500 to-pink-500 rounded-full transition-all duration-500 ease-out shadow-lg"
-              style={{ width: `${progressPercentage}%` }}
+        {/* Progress Bar */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressText}>Step {currentStep} of {totalSteps}</Text>
+            <Text style={styles.progressPercent}>{Math.round(progressPercentage)}%</Text>
+          </View>
+          <View style={styles.progressTrack}>
+            <LinearGradient 
+              colors={['#EF4444', '#F97316', '#EC4899']} 
+              start={{ x: 0, y: 0 }} 
+              end={{ x: 1, y: 0 }}
+              style={[styles.progressFill, { width: `${progressPercentage}%` }]}
             />
-          </div>
+          </View>
+          
           {/* Step Indicators */}
-          <div className="flex justify-between mt-4">
+          <View style={styles.stepIndicators}>
             {[1, 2, 3].map((step) => (
-              <div key={step} className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  currentStep > step 
-                    ? 'bg-gradient-to-br from-green-400 to-green-500 shadow-lg' 
-                    : currentStep === step 
-                    ? 'bg-gradient-to-br from-red-500 to-orange-500 shadow-lg ring-4 ring-red-200' 
-                    : 'bg-white/50 backdrop-blur-sm'
-                }`}>
-                  {currentStep > step ? (
-                    <CheckCircle2 className="w-5 h-5 text-white" />
-                  ) : (
-                    <span className={`text-sm font-bold ${currentStep === step ? 'text-white' : 'text-gray-400'}`}>
-                      {step}
-                    </span>
-                  )}
-                </div>
-                <span className={`text-xs mt-1 font-medium ${currentStep >= step ? 'text-gray-900' : 'text-gray-500'}`}>
+              <View key={step} style={styles.stepItem}>
+                {currentStep > step ? (
+                  <LinearGradient colors={['#34D399', '#10B981']} style={styles.stepCircle}>
+                    <Icon name="check" size={16} color="#FFFFFF" />
+                  </LinearGradient>
+                ) : currentStep === step ? (
+                  <LinearGradient colors={['#EF4444', '#F97316']} style={[styles.stepCircle, styles.activeStepCircle]}>
+                    <Text style={styles.stepNumber}>{step}</Text>
+                  </LinearGradient>
+                ) : (
+                  <View style={styles.stepCircleInactive}>
+                    <Text style={styles.stepNumberInactive}>{step}</Text>
+                  </View>
+                )}
+                <Text style={[styles.stepLabel, currentStep >= step && styles.stepLabelActive]}>
                   {step === 1 ? 'Basic' : step === 2 ? 'Health' : 'Goals'}
-                </span>
-              </div>
+                </Text>
+              </View>
             ))}
-          </div>
-        </div>
-      </div>
+          </View>
+        </View>
 
-      {/* Content */}
-      <div className="relative z-10 px-6 pb-32">
-        <div className="max-w-md mx-auto">
-          {/* Header with Animation */}
-          <div className="text-center mb-8 animate-fade-in">
-            <div className="relative inline-block mb-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-red-500 via-orange-500 to-pink-500 rounded-3xl mx-auto flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                {currentStep === 1 && <User className="w-10 h-10 text-white" />}
-                {currentStep === 2 && <Activity className="w-10 h-10 text-white" />}
-                {currentStep === 3 && <Target className="w-10 h-10 text-white" />}
-              </div>
-              <div className="absolute -top-1 -right-1">
-                <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+        <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+          {/* Step Header */}
+          <View style={styles.stepHeader}>
+            <View style={styles.iconWrapper}>
+              <LinearGradient colors={['#EF4444', '#F97316', '#EC4899']} style={styles.stepIconBg}>
+                <Icon name={renderStepIcon()} size={32} color="#FFFFFF" />
+              </LinearGradient>
+              <Icon name="star-four-points" size={20} color="#FBBF24" style={styles.sparkle} />
+            </View>
+            <Text style={styles.stepTitle}>
               {currentStep === 1 && 'Basic Information'}
               {currentStep === 2 && 'Medical History'}
               {currentStep === 3 && 'Your Goals'}
-            </h1>
-            <p className="text-gray-600">
+            </Text>
+            <Text style={styles.stepSubtitle}>
               {currentStep === 1 && 'Help us personalize your therapy experience'}
               {currentStep === 2 && 'Share your health information for better care'}
               {currentStep === 3 && 'What do you want to achieve?'}
-            </p>
-          </div>
+            </Text>
+          </View>
 
-          {/* Form Cards */}
-          <div className="space-y-6">
-            {/* Step 1: Basic Info */}
-            {currentStep === 1 && (
-              <div className="space-y-4 animate-scale-in">
-                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md overflow-hidden">
-                  <div className="h-2 bg-gradient-to-r from-red-500 via-orange-500 to-pink-500"></div>
-                  <CardContent className="p-6 space-y-4">{/* Basic Info Fields */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="age" className="text-gray-700 flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-red-500" />
-                          <span>Age</span>
-                        </Label>
-                        <Input
-                          id="age"
-                          type="number"
-                          placeholder="25"
-                          value={profileData.age}
-                          onChange={(e) => handleInputChange('age', e.target.value)}
-                          className="h-12 rounded-xl border-2 border-gray-200 focus:border-red-500 focus:ring-red-500 transition-all"
-                        />
-                      </div>
+          {/* Step 1: Basic Info */}
+          {currentStep === 1 && (
+            <View style={styles.card}>
+              <LinearGradient colors={['#EF4444', '#F97316', '#EC4899']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.cardAccent} />
+              
+              <View style={styles.inputRow}>
+                <View style={styles.inputHalf}>
+                  <View style={styles.labelRow}>
+                    <Icon name="calendar" size={16} color="#EF4444" />
+                    <Text style={styles.label}>Age</Text>
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="25"
+                    placeholderTextColor="#9CA3AF"
+                    value={profileData.age}
+                    onChangeText={(value) => handleInputChange('age', value)}
+                    keyboardType="numeric"
+                  />
+                </View>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="gender" className="text-gray-700">Gender</Label>
-                        <Select value={profileData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
-                          <SelectTrigger className="h-12 rounded-xl border-2 border-gray-200 focus:border-red-500 focus:ring-red-500 transition-all">
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                            <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="weight" className="text-gray-700 flex items-center space-x-2">
-                          <Weight className="w-4 h-4 text-red-500" />
-                          <span>Weight (kg)</span>
-                        </Label>
-                        <Input
-                          id="weight"
-                          type="number"
-                          placeholder="70"
-                          value={profileData.weight}
-                          onChange={(e) => handleInputChange('weight', e.target.value)}
-                          className="h-12 rounded-xl border-2 border-gray-200 focus:border-red-500 focus:ring-red-500 transition-all"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="height" className="text-gray-700 flex items-center space-x-2">
-                          <Ruler className="w-4 h-4 text-red-500" />
-                          <span>Height (cm)</span>
-                        </Label>
-                        <Input
-                          id="height"
-                          type="number"
-                          placeholder="175"
-                          value={profileData.height}
-                          onChange={(e) => handleInputChange('height', e.target.value)}
-                          className="h-12 rounded-xl border-2 border-gray-200 focus:border-red-500 focus:ring-red-500 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-gray-700 flex items-center space-x-2">
-                        <Activity className="w-4 h-4 text-red-500" />
-                        <span>Activity Level</span>
-                      </Label>
-                      <Select value={profileData.activityLevel} onValueChange={(value) => handleInputChange('activityLevel', value)}>
-                        <SelectTrigger className="h-12 rounded-xl border-2 border-gray-200 focus:border-red-500 focus:ring-red-500 transition-all">
-                          <SelectValue placeholder="Select your activity level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sedentary">🪑 Sedentary (Little to no exercise)</SelectItem>
-                          <SelectItem value="light">🚶 Light (1-3 days/week)</SelectItem>
-                          <SelectItem value="moderate">🏃 Moderate (3-5 days/week)</SelectItem>
-                          <SelectItem value="active">💪 Active (6-7 days/week)</SelectItem>
-                          <SelectItem value="very-active">🔥 Very Active (2x/day or intense)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Step 2: Medical Conditions */}
-            {currentStep === 2 && (
-              <div className="space-y-4 animate-scale-in">
-                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md overflow-hidden">
-                  <div className="h-2 bg-gradient-to-r from-red-500 via-orange-500 to-pink-500"></div>
-                  <CardContent className="p-6 space-y-4">
-                    <Label className="text-gray-700">Do you have any of these conditions?</Label>
-                    <div className="grid grid-cols-1 gap-3">
-                      {medicalConditionOptions.map((condition) => (
-                        <label
-                          key={condition}
-                          className={`flex items-center space-x-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                            profileData.medicalConditions.includes(condition)
-                              ? 'border-red-500 bg-red-50 shadow-md'
-                              : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
-                          }`}
+                <View style={styles.inputHalf}>
+                  <Text style={styles.label}>Gender</Text>
+                  <TouchableOpacity 
+                    style={styles.selectButton}
+                    onPress={() => setShowGenderPicker(!showGenderPicker)}
+                  >
+                    <Text style={profileData.gender ? styles.selectValue : styles.selectPlaceholder}>
+                      {genderOptions.find(g => g.value === profileData.gender)?.label || 'Select'}
+                    </Text>
+                    <Icon name="chevron-down" size={18} color="#6B7280" />
+                  </TouchableOpacity>
+                  {showGenderPicker && (
+                    <View style={styles.pickerDropdown}>
+                      {genderOptions.map((option) => (
+                        <TouchableOpacity 
+                          key={option.value}
+                          style={styles.pickerOption}
+                          onPress={() => {
+                            handleInputChange('gender', option.value);
+                            setShowGenderPicker(false);
+                          }}
                         >
-                          <Checkbox
-                            id={condition}
-                            checked={profileData.medicalConditions.includes(condition)}
-                            onCheckedChange={(checked) => 
-                              handleArrayFieldChange('medicalConditions', condition, checked as boolean)
-                            }
-                            className="data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
-                          />
-                          <span className={`flex-1 font-medium ${
-                            profileData.medicalConditions.includes(condition) ? 'text-red-700' : 'text-gray-700'
-                          }`}>
-                            {condition}
-                          </span>
-                          {profileData.medicalConditions.includes(condition) && (
-                            <CheckCircle2 className="w-5 h-5 text-red-500" />
-                          )}
-                        </label>
+                          <Text style={styles.pickerOptionText}>{option.label}</Text>
+                        </TouchableOpacity>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                    </View>
+                  )}
+                </View>
+              </View>
 
-            {/* Step 3: Goals */}
-            {currentStep === 3 && (
-              <div className="space-y-4 animate-scale-in">
-                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md overflow-hidden">
-                  <div className="h-2 bg-gradient-to-r from-red-500 via-orange-500 to-pink-500"></div>
-                  <CardContent className="p-6 space-y-4">
-                    <Label className="text-gray-700">What are your primary goals?</Label>
-                    <div className="grid grid-cols-1 gap-3">
-                      {goalOptions.map((goal, index) => {
-                        const icons = ['🎯', '💪', '🧘', '😌', '😴', '✨'];
-                        return (
-                          <label
-                            key={goal}
-                            className={`flex items-center space-x-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                              profileData.goals.includes(goal)
-                                ? 'border-red-500 bg-red-50 shadow-md transform scale-105'
-                                : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            <Checkbox
-                              id={goal}
-                              checked={profileData.goals.includes(goal)}
-                              onCheckedChange={(checked) => 
-                                handleArrayFieldChange('goals', goal, checked as boolean)
-                              }
-                              className="data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
-                            />
-                            <span className="text-2xl">{icons[index]}</span>
-                            <span className={`flex-1 font-medium ${
-                              profileData.goals.includes(goal) ? 'text-red-700' : 'text-gray-700'
-                            }`}>
-                              {goal}
-                            </span>
-                            {profileData.goals.includes(goal) && (
-                              <CheckCircle2 className="w-5 h-5 text-red-500" />
-                            )}
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+              <View style={styles.inputRow}>
+                <View style={styles.inputHalf}>
+                  <View style={styles.labelRow}>
+                    <Icon name="weight" size={16} color="#EF4444" />
+                    <Text style={styles.label}>Weight (kg)</Text>
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="70"
+                    placeholderTextColor="#9CA3AF"
+                    value={profileData.weight}
+                    onChangeText={(value) => handleInputChange('weight', value)}
+                    keyboardType="numeric"
+                  />
+                </View>
 
-      {/* Fixed Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-200 p-6 shadow-2xl z-20">
-        <div className="max-w-md mx-auto space-y-3">
+                <View style={styles.inputHalf}>
+                  <View style={styles.labelRow}>
+                    <Icon name="human-male-height" size={16} color="#EF4444" />
+                    <Text style={styles.label}>Height (cm)</Text>
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="175"
+                    placeholderTextColor="#9CA3AF"
+                    value={profileData.height}
+                    onChangeText={(value) => handleInputChange('height', value)}
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputFull}>
+                <View style={styles.labelRow}>
+                  <Icon name="run" size={16} color="#EF4444" />
+                  <Text style={styles.label}>Activity Level</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.selectButton}
+                  onPress={() => setShowActivityPicker(!showActivityPicker)}
+                >
+                  <Text style={profileData.activityLevel ? styles.selectValue : styles.selectPlaceholder}>
+                    {activityOptions.find(a => a.value === profileData.activityLevel)?.label || 'Select your activity level'}
+                  </Text>
+                  <Icon name="chevron-down" size={18} color="#6B7280" />
+                </TouchableOpacity>
+                {showActivityPicker && (
+                  <View style={styles.pickerDropdown}>
+                    {activityOptions.map((option) => (
+                      <TouchableOpacity 
+                        key={option.value}
+                        style={styles.pickerOption}
+                        onPress={() => {
+                          handleInputChange('activityLevel', option.value);
+                          setShowActivityPicker(false);
+                        }}
+                      >
+                        <Text style={styles.pickerOptionText}>{option.label}</Text>
+                        <Text style={styles.pickerOptionDesc}>{option.desc}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+
+          {/* Step 2: Medical Conditions */}
+          {currentStep === 2 && (
+            <View style={styles.card}>
+              <LinearGradient colors={['#EF4444', '#F97316', '#EC4899']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.cardAccent} />
+              <Text style={styles.cardLabel}>Do you have any of these conditions?</Text>
+              
+              {medicalConditionOptions.map((condition) => {
+                const isSelected = profileData.medicalConditions.includes(condition);
+                return (
+                  <TouchableOpacity 
+                    key={condition}
+                    style={[styles.checkboxItem, isSelected && styles.checkboxItemSelected]}
+                    onPress={() => handleArrayFieldChange('medicalConditions', condition)}
+                  >
+                    <View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
+                      {isSelected && <Icon name="check" size={14} color="#FFFFFF" />}
+                    </View>
+                    <Text style={[styles.checkboxLabel, isSelected && styles.checkboxLabelSelected]}>
+                      {condition}
+                    </Text>
+                    {isSelected && <Icon name="check-circle" size={20} color="#EF4444" />}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+
+          {/* Step 3: Goals */}
+          {currentStep === 3 && (
+            <View style={styles.card}>
+              <LinearGradient colors={['#EF4444', '#F97316', '#EC4899']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.cardAccent} />
+              <Text style={styles.cardLabel}>What are your primary goals?</Text>
+              
+              {goalOptions.map((goal) => {
+                const isSelected = profileData.goals.includes(goal.label);
+                return (
+                  <TouchableOpacity 
+                    key={goal.label}
+                    style={[styles.goalItem, isSelected && styles.goalItemSelected]}
+                    onPress={() => handleArrayFieldChange('goals', goal.label)}
+                  >
+                    <View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
+                      {isSelected && <Icon name="check" size={14} color="#FFFFFF" />}
+                    </View>
+                    <Text style={styles.goalIcon}>{goal.icon}</Text>
+                    <Text style={[styles.goalLabel, isSelected && styles.goalLabelSelected]}>
+                      {goal.label}
+                    </Text>
+                    {isSelected && <Icon name="check-circle" size={20} color="#EF4444" />}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Bottom Actions */}
+        <View style={styles.bottomActions}>
           {currentStep < totalSteps ? (
-            <Button
-              onClick={handleNext}
+            <TouchableOpacity 
+              onPress={handleNext}
               disabled={!isStepValid()}
-              className="w-full h-14 bg-gradient-to-r from-red-500 via-orange-500 to-pink-500 hover:from-red-600 hover:via-orange-600 hover:to-pink-600 text-white rounded-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105"
+              style={[styles.continueButton, !isStepValid() && styles.buttonDisabled]}
             >
-              <span className="font-semibold">Continue</span>
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
+              <LinearGradient 
+                colors={isStepValid() ? ['#EF4444', '#F97316', '#EC4899'] : ['#D1D5DB', '#D1D5DB']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.continueGradient}
+              >
+                <Text style={styles.continueText}>Continue</Text>
+                <Icon name="chevron-right" size={20} color="#FFFFFF" />
+              </LinearGradient>
+            </TouchableOpacity>
           ) : (
-            <Button
-              onClick={handleComplete}
+            <TouchableOpacity 
+              onPress={handleComplete}
               disabled={isLoading || !isStepValid()}
-              className="w-full h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl shadow-xl disabled:opacity-50 transition-all duration-300 transform hover:scale-105"
+              style={[styles.completeButton, (!isStepValid() || isLoading) && styles.buttonDisabled]}
             >
-              {isLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span className="font-semibold">Saving Profile...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span className="font-semibold">Complete Setup</span>
-                </div>
-              )}
-            </Button>
+              <LinearGradient 
+                colors={isStepValid() ? ['#10B981', '#059669'] : ['#D1D5DB', '#D1D5DB']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.continueGradient}
+              >
+                {isLoading ? (
+                  <>
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <Text style={styles.continueText}>Saving Profile...</Text>
+                  </>
+                ) : (
+                  <>
+                    <Icon name="check-circle" size={20} color="#FFFFFF" />
+                    <Text style={styles.continueText}>Complete Setup</Text>
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
           )}
           
-          <div className="text-center">
-            <Button
-              variant="ghost"
-              onClick={() => onNavigate('welcome')}
-              className="text-gray-500 hover:text-gray-700 text-sm"
-            >
-              Skip for now
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+          <TouchableOpacity onPress={() => onNavigate('welcome')} style={styles.skipButton}>
+            <Text style={styles.skipText}>Skip for now</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 16,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 20,
+  },
+  backText: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  logo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 24,
+  },
+  logoIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  progressSection: {
+    paddingHorizontal: 24,
+    marginBottom: 20,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  progressPercent: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#EF4444',
+  },
+  progressTrack: {
+    height: 8,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  stepIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    paddingHorizontal: 20,
+  },
+  stepItem: {
+    alignItems: 'center',
+  },
+  stepCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activeStepCircle: {
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  stepCircleInactive: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepNumber: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  stepNumberInactive: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9CA3AF',
+  },
+  stepLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#9CA3AF',
+    marginTop: 6,
+  },
+  stepLabelActive: {
+    color: '#111827',
+  },
+  content: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 160,
+  },
+  stepHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  iconWrapper: {
+    position: 'relative',
+    marginBottom: 16,
+  },
+  stepIconBg: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  sparkle: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+  },
+  stepTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
+  },
+  stepSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 6,
+    overflow: 'hidden',
+  },
+  cardAccent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+  },
+  cardLabel: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  inputHalf: {
+    flex: 1,
+  },
+  inputFull: {
+    marginBottom: 8,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  input: {
+    height: 48,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    fontSize: 15,
+    color: '#111827',
+  },
+  selectButton: {
+    height: 48,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selectValue: {
+    fontSize: 15,
+    color: '#111827',
+  },
+  selectPlaceholder: {
+    fontSize: 15,
+    color: '#9CA3AF',
+  },
+  pickerDropdown: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    marginTop: 4,
+    paddingVertical: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  pickerOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  pickerOptionText: {
+    fontSize: 15,
+    color: '#111827',
+  },
+  pickerOptionDesc: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  checkboxItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    marginBottom: 10,
+    gap: 12,
+  },
+  checkboxItemSelected: {
+    borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#EF4444',
+    borderColor: '#EF4444',
+  },
+  checkboxLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  checkboxLabelSelected: {
+    color: '#B91C1C',
+  },
+  goalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    marginBottom: 10,
+    gap: 12,
+  },
+  goalItemSelected: {
+    borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
+  },
+  goalIcon: {
+    fontSize: 24,
+  },
+  goalLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  goalLabelSelected: {
+    color: '#B91C1C',
+  },
+  bottomActions: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 36,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  continueButton: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  completeButton: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  continueGradient: {
+    height: 56,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  continueText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  skipButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  skipText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+});
 
 export default ProfileSetupScreen;

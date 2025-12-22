@@ -577,3 +577,16 @@ body {
   background: rgba(17, 24, 39, 0.9);
   border-top-color: rgba(255, 255, 255, 0.1);
 }
+
+/* Safe Area Utilities - Consistent top padding across all screens */
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 2.5rem);
+}
+
+.safe-top-sm {
+  padding-top: max(env(safe-area-inset-top), 1.5rem);
+}
+
+.safe-top-lg {
+  padding-top: max(env(safe-area-inset-top), 3rem);
+}

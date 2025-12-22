@@ -334,7 +334,7 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
   }
 
   return (
-    <div className="px-4 py-6 space-y-6 pb-24 max-h-screen overflow-y-auto scroll-smooth">
+    <div className="px-4 space-y-6 pb-24 max-h-screen overflow-y-auto scroll-smooth safe-top">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Therapy Center</h1>

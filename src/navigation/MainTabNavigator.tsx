@@ -8,9 +8,19 @@ import HomeScreen from '../screens/HomeScreen';
 import TherapyScreen from '../screens/TherapyScreen';
 import AIAssistantScreen from '../screens/AIAssistantScreen';
 import ReportsScreen from '../screens/ReportsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
+
+// Custom Tab Icon with background for active state
+const TabIcon = ({ focused, iconName, label }: { focused: boolean; iconName: string; label: string }) => (
+  <View style={[styles.tabIconContainer, focused && styles.tabIconActive]}>
+    <Icon 
+      name={iconName} 
+      size={24} 
+      color={focused ? '#F52E32' : '#9CA3AF'} 
+    />
+  </View>
+);
 
 export const MainTabNavigator = () => {
   return (
@@ -19,18 +29,24 @@ export const MainTabNavigator = () => {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
-          borderTopColor: '#E5E7EB',
+          borderTopColor: '#F3F4F6',
           borderTopWidth: 1,
-          height: 70,
-          paddingBottom: 8,
-          paddingTop: 8,
-          elevation: 12,
+          height: 80,
+          paddingBottom: 16,
+          paddingTop: 12,
+          paddingHorizontal: 8,
+          elevation: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
         },
         tabBarActiveTintColor: '#F52E32',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '700',
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: 4,
         },
       }}
     >
@@ -38,8 +54,8 @@ export const MainTabNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} iconName="home-outline" label="Home" />
           ),
         }}
       />
@@ -47,17 +63,8 @@ export const MainTabNavigator = () => {
         name="Therapy"
         component={TherapyScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="hospital-box" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="AI Assistant"
-        component={AIAssistantScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="robot" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} iconName="pulse" label="Therapy" />
           ),
         }}
       />
@@ -65,20 +72,33 @@ export const MainTabNavigator = () => {
         name="Reports"
         component={ReportsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="chart-line" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} iconName="chart-bar" label="Reports" />
           ),
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="AI"
+        component={AIAssistantScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="account" size={size} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} iconName="robot-outline" label="AI" />
           ),
         }}
       />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  tabIconContainer: {
+    width: 48,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabIconActive: {
+    backgroundColor: '#FEE2E2',
+  },
+});

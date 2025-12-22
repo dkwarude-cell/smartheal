@@ -53,14 +53,14 @@
     "src/context/**/*",
     "src/services/**/*",
     "src/config/**/*",
-    "src/types/**/*"
+    "src/types/**/*",
+    "src/components/**/*"
   ],
   "exclude": [
     "node_modules",
     "src/App.tsx",
     "src/App.tsx.old.web",
     "src/main.tsx",
-    "src/components/**/*",
     "src/assets/**/*",
     "src/styles/**/*",
     "src/functions/**/*",

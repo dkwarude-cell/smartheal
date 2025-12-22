@@ -29,7 +29,7 @@ export function DashboardScreen({ onNavigate }: DashboardScreenProps) {
   };
 
   return (
-    <div className="min-h-full p-4 space-y-4 pb-8">
+    <div className="min-h-full p-4 space-y-4 pb-8 safe-top">
       {/* Device Status - Enhanced */}
       <Card className="p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800">
         <div className="flex items-center justify-between">

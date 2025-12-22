@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { 
-  ArrowLeft, Play, Pause, Clock, Zap, Target, Calendar,
-  CheckCircle, Activity, Heart, TrendingUp, Volume2, VolumeX
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Svg, Circle } from 'react-native-svg';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface SessionDetailScreenProps {
   session: any;
@@ -16,274 +14,518 @@ export function SessionDetailScreen({ session, onBack, onStart }: SessionDetailS
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying && progress < 100) {
+      interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            setIsPlaying(false);
+            return 100;
+          }
+          return prev + 1;
+        });
+      }, 300);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, progress]);
+
   const handleStartSession = () => {
     setIsPlaying(true);
     if (onStart) onStart();
-    // Simulate progress
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsPlaying(false);
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, 300);
   };
 
+  const circumference = 2 * Math.PI * 56;
+  const strokeDashoffset = circumference * (1 - progress / 100);
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <View style={styles.container}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 px-4 py-4">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
-        </button>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <Icon name="arrow-left" size={22} color="#6B7280" />
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
         
-        <div>
-          <h1 className="text-gray-900 mb-1">{session.type}</h1>
-          <p className="text-gray-600 text-sm">{session.bodyPart} • {session.duration}</p>
-        </div>
-      </div>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>{session?.type || 'Session'}</Text>
+          <Text style={styles.headerSubtitle}>{session?.bodyPart || 'Full Body'} • {session?.duration || '30 min'}</Text>
+        </View>
+      </View>
 
-      {/* Main Content */}
-      <div className="p-4 space-y-4">
-        {/* Session Preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl p-6 text-white relative overflow-hidden"
-        >
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0" style={{ 
-              backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-              backgroundSize: '20px 20px'
-            }} />
-          </div>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        {/* Session Preview Card */}
+        <View style={styles.previewCard}>
+          {/* Background Pattern */}
+          <View style={styles.patternOverlay} />
 
-          <div className="relative z-10">
-            {!isPlaying && progress === 0 && (
-              <>
-                <div className="flex items-center gap-2 mb-4">
-                  <Zap className="w-5 h-5" />
-                  <span className="text-sm">Ready to start</span>
-                </div>
-                <h2 className="text-2xl mb-2">{session.type}</h2>
-                <p className="text-white/90 mb-6">{session.description || 'Professional therapy session optimized for recovery'}</p>
-                
-                <button
-                  onClick={handleStartSession}
-                  className="w-full bg-white text-red-600 py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-white/95 transition-all shadow-lg"
-                >
-                  <Play className="w-6 h-6" />
-                  <span className="text-lg">Start Session</span>
-                </button>
-              </>
-            )}
+          {!isPlaying && progress === 0 ? (
+            <View style={styles.previewContent}>
+              <View style={styles.readyBadge}>
+                <Icon name="lightning-bolt" size={18} color="#FFFFFF" />
+                <Text style={styles.readyText}>Ready to start</Text>
+              </View>
+              
+              <Text style={styles.previewTitle}>{session?.type || 'Therapy Session'}</Text>
+              <Text style={styles.previewDescription}>
+                {session?.description || 'Professional therapy session optimized for recovery'}
+              </Text>
+              
+              <TouchableOpacity onPress={handleStartSession} style={styles.startButton}>
+                <Icon name="play" size={24} color="#EF4444" />
+                <Text style={styles.startButtonText}>Start Session</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.previewContent}>
+              <View style={styles.progressHeader}>
+                <View style={styles.statusBadge}>
+                  {isPlaying ? (
+                    <>
+                      <Icon name="pulse" size={18} color="#FFFFFF" />
+                      <Text style={styles.statusText}>In Progress</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="check-circle" size={18} color="#FFFFFF" />
+                      <Text style={styles.statusText}>Completed</Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity onPress={() => setIsMuted(!isMuted)} style={styles.muteButton}>
+                  <Icon name={isMuted ? 'volume-off' : 'volume-high'} size={20} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
 
-            {(isPlaying || progress > 0) && (
-              <>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    {isPlaying ? (
-                      <>
-                        <Activity className="w-5 h-5 animate-pulse" />
-                        <span className="text-sm">In Progress</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="w-5 h-5" />
-                        <span className="text-sm">Completed</span>
-                      </>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="p-2 rounded-lg bg-white/20 hover:bg-white/30"
-                  >
-                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </button>
-                </div>
+              {/* Progress Circle */}
+              <View style={styles.progressCircle}>
+                <Svg width={128} height={128} style={styles.svg}>
+                  <Circle
+                    cx={64}
+                    cy={64}
+                    r={56}
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth={8}
+                    fill="none"
+                  />
+                  <Circle
+                    cx={64}
+                    cy={64}
+                    r={56}
+                    stroke="#FFFFFF"
+                    strokeWidth={8}
+                    fill="none"
+                    strokeDasharray={`${circumference}`}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    rotation={-90}
+                    origin="64, 64"
+                  />
+                </Svg>
+                <View style={styles.progressText}>
+                  <Text style={styles.progressPercent}>{Math.round(progress)}%</Text>
+                </View>
+              </View>
 
-                {/* Progress Circle */}
-                <div className="flex items-center justify-center my-8">
-                  <div className="relative w-32 h-32">
-                    <svg className="w-full h-full transform -rotate-90">
-                      <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="rgba(255,255,255,0.2)"
-                        strokeWidth="8"
-                        fill="none"
-                      />
-                      <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="white"
-                        strokeWidth="8"
-                        fill="none"
-                        strokeDasharray={`${2 * Math.PI * 56}`}
-                        strokeDashoffset={`${2 * Math.PI * 56 * (1 - progress / 100)}`}
-                        strokeLinecap="round"
-                        className="transition-all duration-300"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl">{Math.round(progress)}%</span>
-                    </div>
-                  </div>
-                </div>
+              <View style={styles.timeRemaining}>
+                <Text style={styles.timeLabel}>Time Remaining</Text>
+                <Text style={styles.timeValue}>{Math.ceil((45 * (100 - progress)) / 100)} min</Text>
+              </View>
 
-                <div className="text-center mb-4">
-                  <div className="text-white/90 text-sm mb-1">Time Remaining</div>
-                  <div className="text-2xl">{Math.ceil((45 * (100 - progress)) / 100)} min</div>
-                </div>
-
-                {isPlaying && (
-                  <button
-                    onClick={() => setIsPlaying(false)}
-                    className="w-full bg-white/20 backdrop-blur-sm text-white py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-white/30 transition-all"
-                  >
-                    <Pause className="w-5 h-5" />
-                    <span>Pause Session</span>
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </motion.div>
+              {isPlaying && (
+                <TouchableOpacity onPress={() => setIsPlaying(false)} style={styles.pauseButton}>
+                  <Icon name="pause" size={20} color="#FFFFFF" />
+                  <Text style={styles.pauseButtonText}>Pause Session</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
 
         {/* Session Details */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-5 border border-gray-100"
-        >
-          <h3 className="text-gray-900 mb-4">Session Details</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Duration</div>
-                  <div className="text-gray-900">{session.duration}</div>
-                </div>
-              </div>
-            </div>
+        <View style={styles.detailsCard}>
+          <Text style={styles.cardTitle}>Session Details</Text>
+          
+          <View style={styles.detailRow}>
+            <View style={[styles.detailIcon, { backgroundColor: '#EFF6FF' }]}>
+              <Icon name="clock-outline" size={20} color="#3B82F6" />
+            </View>
+            <View style={styles.detailInfo}>
+              <Text style={styles.detailLabel}>Duration</Text>
+              <Text style={styles.detailValue}>{session?.duration || '30 min'}</Text>
+            </View>
+          </View>
 
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Intensity</div>
-                  <div className="text-gray-900">{session.intensity}</div>
-                </div>
-              </div>
-            </div>
+          <View style={styles.detailRow}>
+            <View style={[styles.detailIcon, { backgroundColor: '#FFF7ED' }]}>
+              <Icon name="lightning-bolt" size={20} color="#F97316" />
+            </View>
+            <View style={styles.detailInfo}>
+              <Text style={styles.detailLabel}>Intensity</Text>
+              <Text style={styles.detailValue}>{session?.intensity || 'Medium'}</Text>
+            </View>
+          </View>
 
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Target Area</div>
-                  <div className="text-gray-900">{session.bodyPart}</div>
-                </div>
-              </div>
-            </div>
+          <View style={styles.detailRow}>
+            <View style={[styles.detailIcon, { backgroundColor: '#F5F3FF' }]}>
+              <Icon name="target" size={20} color="#8B5CF6" />
+            </View>
+            <View style={styles.detailInfo}>
+              <Text style={styles.detailLabel}>Target Area</Text>
+              <Text style={styles.detailValue}>{session?.bodyPart || 'Full Body'}</Text>
+            </View>
+          </View>
 
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Scheduled</div>
-                  <div className="text-gray-900">{session.date || 'Today'} • {session.time}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+          <View style={[styles.detailRow, { borderBottomWidth: 0 }]}>
+            <View style={[styles.detailIcon, { backgroundColor: '#ECFDF5' }]}>
+              <Icon name="calendar" size={20} color="#10B981" />
+            </View>
+            <View style={styles.detailInfo}>
+              <Text style={styles.detailLabel}>Scheduled</Text>
+              <Text style={styles.detailValue}>{session?.time || 'Today'}</Text>
+            </View>
+          </View>
+        </View>
 
         {/* Expected Benefits */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-5 border border-gray-100"
-        >
-          <h3 className="text-gray-900 mb-4">Expected Benefits</h3>
-          <div className="space-y-3">
-            {[
-              { icon: Heart, text: 'Improved blood circulation', color: 'red' },
-              { icon: Activity, text: 'Reduced muscle tension', color: 'blue' },
-              { icon: TrendingUp, text: 'Enhanced recovery speed', color: 'green' },
-              { icon: Zap, text: 'Better performance readiness', color: 'orange' }
-            ].map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <div key={index} className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    benefit.color === 'red' ? 'bg-red-50' :
-                    benefit.color === 'blue' ? 'bg-blue-50' :
-                    benefit.color === 'green' ? 'bg-green-50' :
-                    'bg-orange-50'
-                  }`}>
-                    <Icon className={`w-4 h-4 ${
-                      benefit.color === 'red' ? 'text-red-600' :
-                      benefit.color === 'blue' ? 'text-blue-600' :
-                      benefit.color === 'green' ? 'text-green-600' :
-                      'text-orange-600'
-                    }`} />
-                  </div>
-                  <span className="text-gray-700 text-sm">{benefit.text}</span>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
+        <View style={styles.benefitsCard}>
+          <Text style={styles.cardTitle}>Expected Benefits</Text>
+          
+          {[
+            { icon: 'heart-pulse', text: 'Improved blood circulation', color: '#EF4444', bg: '#FEF2F2' },
+            { icon: 'arm-flex', text: 'Reduced muscle tension', color: '#3B82F6', bg: '#EFF6FF' },
+            { icon: 'trending-up', text: 'Enhanced recovery speed', color: '#10B981', bg: '#ECFDF5' },
+            { icon: 'lightning-bolt', text: 'Better performance readiness', color: '#F97316', bg: '#FFF7ED' }
+          ].map((benefit, index) => (
+            <View key={index} style={styles.benefitRow}>
+              <View style={[styles.benefitIcon, { backgroundColor: benefit.bg }]}>
+                <Icon name={benefit.icon} size={18} color={benefit.color} />
+              </View>
+              <Text style={styles.benefitText}>{benefit.text}</Text>
+            </View>
+          ))}
+        </View>
 
-        {/* Post-Session Actions */}
+        {/* Completion Card */}
         {progress === 100 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-green-50 rounded-2xl p-5 border border-green-200"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-gray-900">Session Complete!</h3>
-                <p className="text-gray-600 text-sm">How did it go?</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <button className="flex-1 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-sm">
-                Rate Session
-              </button>
-              <button className="flex-1 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 text-sm">
-                Add Notes
-              </button>
-            </div>
-          </motion.div>
+          <View style={styles.completionCard}>
+            <View style={styles.completionHeader}>
+              <View style={styles.completionIcon}>
+                <Icon name="check-circle" size={28} color="#FFFFFF" />
+              </View>
+              <View style={styles.completionInfo}>
+                <Text style={styles.completionTitle}>Session Complete!</Text>
+                <Text style={styles.completionSubtitle}>How did it go?</Text>
+              </View>
+            </View>
+            <View style={styles.completionActions}>
+              <TouchableOpacity style={styles.rateButton}>
+                <Text style={styles.rateButtonText}>Rate Session</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.notesButton}>
+                <Text style={styles.notesButtonText}>Add Notes</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
-      </div>
-    </div>
+      </ScrollView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  header: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 16,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  backText: {
+    fontSize: 15,
+    color: '#6B7280',
+  },
+  headerContent: {},
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  content: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 100,
+    gap: 16,
+  },
+  previewCard: {
+    backgroundColor: '#EF4444',
+    borderRadius: 20,
+    padding: 24,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  patternOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.1,
+  },
+  previewContent: {
+    position: 'relative',
+    zIndex: 10,
+  },
+  readyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 16,
+  },
+  readyText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  previewTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  previewDescription: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  startButton: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    paddingVertical: 16,
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  startButtonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#EF4444',
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statusText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  muteButton: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  progressCircle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 24,
+  },
+  svg: {
+    transform: [{ rotate: '-90deg' }],
+  },
+  progressText: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressPercent: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  timeRemaining: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  timeLabel: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 4,
+  },
+  timeValue: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  pauseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  pauseButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  detailsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 16,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  detailIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  detailInfo: {
+    marginLeft: 14,
+  },
+  detailLabel: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  detailValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  benefitsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  benefitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  benefitIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  benefitText: {
+    fontSize: 14,
+    color: '#374151',
+    marginLeft: 12,
+  },
+  completionCard: {
+    backgroundColor: '#ECFDF5',
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  completionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  completionIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  completionInfo: {
+    marginLeft: 14,
+  },
+  completionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  completionSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  completionActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  rateButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+  },
+  rateButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  notesButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#10B981',
+    alignItems: 'center',
+  },
+  notesButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+});

@@ -8,7 +8,7 @@ interface StartScreenProps {
 
 export function StartScreen({ onNavigate }: StartScreenProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex flex-col safe-top">
       {/* Header */}
       <div className="flex items-center justify-between p-6">
         <div className="flex items-center space-x-2">

@@ -26,7 +26,7 @@ export function HomeTab({ user, isDeviceConnected, onDeviceConnection, onTabChan
   });
 
   return (
-    <div className="px-4 py-6 space-y-6 pb-24 max-h-screen overflow-y-auto scroll-smooth">
+    <div className="px-4 space-y-6 pb-24 max-h-screen overflow-y-auto scroll-smooth safe-top">
       {/* Welcome Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -88,26 +88,79 @@ export function HomeTab({ user, isDeviceConnected, onDeviceConnection, onTabChan
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="smart-heal-card">
-          <CardContent className="p-4 text-center">
-            <div className="w-10 h-10 bg-red-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <Activity className="w-5 h-5 text-red-600" />
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Performance Overview</h2>
+          <button className="text-red-500 font-medium text-sm hover:text-red-600 flex items-center gap-1">
+            View All
+            <TrendingUp className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Weekly Distance Card */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden border border-gray-100" style={{ backgroundColor: '#ffffff' }}>
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-cyan-100 opacity-50"></div>
+            <div className="w-12 h-12 rounded-xl bg-cyan-400 flex items-center justify-center mb-4 relative z-10">
+              <Activity className="w-6 h-6 text-white" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">12</p>
-            <p className="text-xs text-gray-500">Sessions This Week</p>
-          </CardContent>
-        </Card>
+            <div className="text-3xl font-bold text-gray-900 mb-1 relative z-10">
+              42.5<span className="text-base font-normal text-gray-500 ml-1">km</span>
+            </div>
+            <div className="text-sm text-gray-600 mb-3 relative z-10">Weekly Distance</div>
+            <div className="flex items-center gap-1 text-sm relative z-10">
+              <span className="font-medium text-green-500">↑ +12%</span>
+              <span className="text-gray-400">vs last week</span>
+            </div>
+          </div>
 
-        <Card className="smart-heal-card">
-          <CardContent className="p-4 text-center">
-            <div className="w-10 h-10 bg-blue-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-blue-600" />
+          {/* Recovery Score Card */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden border border-gray-100" style={{ backgroundColor: '#ffffff' }}>
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-pink-100 opacity-50"></div>
+            <div className="w-12 h-12 rounded-xl bg-pink-500 flex items-center justify-center mb-4 relative z-10">
+              <Heart className="w-6 h-6 text-white" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">47</p>
-            <p className="text-xs text-gray-500">Total Hours</p>
-          </CardContent>
-        </Card>
+            <div className="text-3xl font-bold text-gray-900 mb-1 relative z-10">
+              87<span className="text-base font-normal text-gray-500 ml-1">%</span>
+            </div>
+            <div className="text-sm text-gray-600 mb-3 relative z-10">Recovery Score</div>
+            <div className="flex items-center gap-1 text-sm relative z-10">
+              <span className="font-medium text-green-500">↑ +5%</span>
+              <span className="text-gray-400">vs last week</span>
+            </div>
+          </div>
+
+          {/* Training Load Card */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden border border-gray-100" style={{ backgroundColor: '#ffffff' }}>
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-orange-100 opacity-50"></div>
+            <div className="w-12 h-12 rounded-xl bg-orange-400 flex items-center justify-center mb-4 relative z-10">
+              <Zap className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1 relative z-10">
+              245
+            </div>
+            <div className="text-sm text-gray-600 mb-3 relative z-10">Training Load</div>
+            <div className="flex items-center gap-1 text-sm relative z-10">
+              <span className="font-medium text-red-500">↓ -8%</span>
+              <span className="text-gray-400">vs last week</span>
+            </div>
+          </div>
+
+          {/* Avg Pace Card */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden border border-gray-100" style={{ backgroundColor: '#ffffff' }}>
+            <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-purple-100 opacity-50"></div>
+            <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center mb-4 relative z-10">
+              <Clock className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1 relative z-10">
+              5:20<span className="text-base font-normal text-gray-500 ml-1">/km</span>
+            </div>
+            <div className="text-sm text-gray-600 mb-3 relative z-10">Avg Pace</div>
+            <div className="flex items-center gap-1 text-sm relative z-10">
+              <span className="font-medium text-green-500">↑ -15s</span>
+              <span className="text-gray-400">vs last week</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Today's Progress */}

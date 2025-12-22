@@ -1,13 +1,19 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Animated, Dimensions, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAuth } from '../context/AuthContext';
 import { useDevice } from '../context/DeviceContext';
+import { useNavigation } from '@react-navigation/native';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const DRAWER_WIDTH = SCREEN_WIDTH * 0.8;
 
 const HomeScreen = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { isConnected } = useDevice();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigation = useNavigation();
 
   const name = useMemo(() => {
     const raw = user?.displayName || user?.email || 'SmartHeal';
@@ -64,10 +70,123 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Sidebar Drawer Modal */}
+      <Modal
+        visible={drawerOpen}
+        transparent={true}
+        animationType="none"
+        onRequestClose={() => setDrawerOpen(false)}
+      >
+        <View style={styles.drawerOverlay}>
+          <Pressable style={styles.drawerBackdrop} onPress={() => setDrawerOpen(false)} />
+          <View style={styles.drawer}>
+            {/* Drawer Header */}
+            <View style={styles.drawerHeader}>
+              <View style={styles.drawerLogo}>
+                <View style={styles.logoIcon}>
+                  <Icon name="heart" size={24} color="#FFFFFF" />
+                </View>
+                <View>
+                  <Text style={styles.drawerBrand}>SmartHeal</Text>
+                  <Text style={styles.drawerSubBrand}>by Runverve</Text>
+                </View>
+              </View>
+              <TouchableOpacity onPress={() => setDrawerOpen(false)} style={styles.closeButton}>
+                <Icon name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {/* User Profile */}
+            <TouchableOpacity style={styles.drawerProfile}>
+              <View style={styles.profileAvatar}>
+                <Icon name="account" size={24} color="#EF4444" />
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>Dr. {name}</Text>
+                <Text style={styles.profileEmail}>{user?.email || 'user@example.com'}</Text>
+              </View>
+              <TouchableOpacity style={styles.shareButton}>
+                <Icon name="share-variant" size={18} color="#6B7280" />
+                <Text style={styles.shareText}>Share</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+
+            {/* Device Status */}
+            <View style={styles.drawerSection}>
+              <Text style={styles.drawerSectionTitle}>Device Status</Text>
+              <View style={styles.deviceStatus}>
+                <View style={styles.deviceInfo}>
+                  <Icon name="bluetooth" size={18} color="#3B82F6" />
+                  <Text style={styles.deviceName}>SmartHeal ITT{'\n'}Device</Text>
+                </View>
+                <View style={[styles.connectionBadge, isConnected ? styles.connectedBadge : styles.disconnectedBadge]}>
+                  <Text style={[styles.connectionText, isConnected ? styles.connectedText : styles.disconnectedText]}>
+                    {isConnected ? 'Connected' : 'Disconnected'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Menu Items */}
+            <View style={styles.drawerMenu}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); (navigation as any).navigate('Profile'); }}>
+                <Icon name="account-outline" size={22} color="#374151" />
+                <Text style={styles.menuText}>My Profile</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); }}>
+                <Icon name="cog-outline" size={22} color="#374151" />
+                <Text style={styles.menuText}>Settings</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); }}>
+                <Icon name="bell-outline" size={22} color="#374151" />
+                <Text style={styles.menuText}>Notifications</Text>
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.badgeText}>3</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); (navigation as any).navigate('DeviceConnection'); }}>
+                <Icon name="bluetooth" size={22} color="#374151" />
+                <Text style={styles.menuText}>Device Settings</Text>
+              </TouchableOpacity>
+
+              <View style={styles.menuDivider} />
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); (navigation as any).navigate('BasicInfo'); }}>
+                <Icon name="heart-outline" size={22} color="#374151" />
+                <Text style={styles.menuText}>Health Profile</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); (navigation as any).navigate('Goals'); }}>
+                <Icon name="target" size={22} color="#374151" />
+                <Text style={styles.menuText}>Goals & Progress</Text>
+              </TouchableOpacity>
+
+              <View style={styles.menuDivider} />
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); logout?.(); }}>
+                <Icon name="logout" size={22} color="#EF4444" />
+                <Text style={[styles.menuText, styles.logoutText]}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Footer */}
+            <View style={styles.drawerFooter}>
+              <Text style={styles.footerVersion}>SmartHeal v2.4.1</Text>
+              <Text style={styles.footerCopyright}>© 2025 Runverve Inc.</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <LinearGradient colors={["#FFFFFF", "#F8FBFF"]} style={styles.gradient}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={styles.topBar}>
-            <TouchableOpacity style={styles.iconButton}><Icon name="menu" size={18} color="#111827" /></TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={() => setDrawerOpen(true)}>
+              <Icon name="menu" size={18} color="#111827" />
+            </TouchableOpacity>
             <View style={styles.brandRow}>
               <Icon name="heart" size={16} color="#F52E32" />
               <Text style={styles.brand}>SmartHeal</Text>
@@ -352,6 +471,217 @@ const styles = StyleSheet.create({
   metricChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: '#111827', marginHorizontal: 4 },
   metricLabel: { color: '#9CA3AF', fontSize: 12, marginTop: 4 },
   metricValue: { color: '#E5E7EB', fontWeight: '800', marginTop: 2 },
+  
+  // Drawer Styles
+  drawerOverlay: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  drawerBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  drawer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: DRAWER_WIDTH,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 20,
+  },
+  drawerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 20,
+    paddingTop: 50,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  drawerLogo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  logoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  drawerBrand: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  drawerSubBrand: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  drawerProfile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    margin: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 16,
+  },
+  profileAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  profileEmail: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  shareText: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  drawerSection: {
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  drawerSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  deviceStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+  },
+  deviceInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  deviceName: {
+    fontSize: 13,
+    color: '#374151',
+    lineHeight: 18,
+  },
+  connectionBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  connectedBadge: {
+    backgroundColor: '#DCFCE7',
+  },
+  disconnectedBadge: {
+    backgroundColor: '#F3F4F6',
+  },
+  connectionText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  connectedText: {
+    color: '#16A34A',
+  },
+  disconnectedText: {
+    color: '#6B7280',
+  },
+  drawerMenu: {
+    paddingHorizontal: 16,
+    flex: 1,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 4,
+  },
+  menuText: {
+    fontSize: 15,
+    color: '#374151',
+    marginLeft: 14,
+    flex: 1,
+  },
+  logoutText: {
+    color: '#EF4444',
+  },
+  notificationBadge: {
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    minWidth: 24,
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 8,
+  },
+  drawerFooter: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    backgroundColor: '#F9FAFB',
+    alignItems: 'center',
+  },
+  footerVersion: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  footerCopyright: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 4,
+  },
 });
 
 export default HomeScreen;
