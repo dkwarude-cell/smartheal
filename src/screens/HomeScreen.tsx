@@ -21,10 +21,10 @@ const HomeScreen = () => {
   }, [user]);
 
   const performance = [
-    { label: 'Weekly Distance', value: '42.5 km', delta: '+12% vs last week', icon: 'walk', color: ['#7BD0FF', '#A6E1FF'] },
-    { label: 'Recovery Score', value: '87%', delta: '+5% vs last week', icon: 'heart-outline', color: ['#FF7BA1', '#FFB5C6'] },
-    { label: 'Training Load', value: '245', delta: '+8% vs last week', icon: 'flash', color: ['#FFD38D', '#FFE4B5'] },
-    { label: 'Avg Pace', value: '5:20/km', delta: '+16s vs last week', icon: 'timer-outline', color: ['#C7B8FF', '#E6DEFF'] },
+    { label: 'Weekly Distance', value: '42.8 km', delta: '+12% vs last week', icon: 'walk', color: ['#ffffffff', '#ffffffff'] },
+    { label: 'Recovery Score', value: '87%', delta: '+5% vs last week', icon: 'heart-outline', color: ['#ffffffff', '#ffffffff'] },
+    { label: 'Training Load', value: '245', delta: '+8% vs last week', icon: 'flash', color: ['#ffffffff', '#ffffffff'] },
+    { label: 'Avg Pace', value: '5:20/km', delta: '+16s vs last week', icon: 'timer-outline', color: ['#ffffffff', '#ffffffff'] },
   ];
 
   const wins = [
@@ -230,22 +230,16 @@ const HomeScreen = () => {
           </View>
           <View style={styles.performanceGrid}>
             {performance.map((item) => (
-              <LinearGradient key={item.label} colors={item.color} style={styles.perfCard}>
+              <View key={item.label} style={styles.perfCard}>
                 <View style={styles.perfIcon}><Icon name={item.icon} size={18} color="#0F172A" /></View>
                 <Text style={styles.perfValue}>{item.value}</Text>
                 <Text style={styles.perfLabel}>{item.label}</Text>
                 <Text style={styles.perfDelta}>{item.delta}</Text>
-              </LinearGradient>
+              </View>
             ))}
           </View>
 
-          <View style={styles.navRow}>
-            {['Home', 'Therapy', 'Training Plan', 'Reports', 'AI'].map((item, idx) => (
-              <TouchableOpacity key={item} style={[styles.navTab, idx === 0 && styles.navTabActive]}>
-                <Text style={[styles.navText, idx === 0 && styles.navTextActive]}>{item}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+    
 
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>This Week’s Wins</Text>
@@ -386,10 +380,14 @@ const styles = StyleSheet.create({
     width: '47%',
     borderRadius: 16,
     padding: 12,
+    backgroundColor: '#FFFFFF',
     shadowColor: '#000000',
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
   perfIcon: {
     width: 30,

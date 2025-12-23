@@ -98,13 +98,13 @@ export function HomeTab({ user, isDeviceConnected, onDeviceConnection, onTabChan
         </div>
         <div className="grid grid-cols-2 gap-4">
           {/* Weekly Distance Card */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden border border-gray-100" style={{ backgroundColor: '#ffffff' }}>
+          <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden border border-gray-100" style={{ backgroundColor: '#ffffffff' }}>
             <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-cyan-100 opacity-50"></div>
             <div className="w-12 h-12 rounded-xl bg-cyan-400 flex items-center justify-center mb-4 relative z-10">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1 relative z-10">
-              42.5<span className="text-base font-normal text-gray-500 ml-1">km</span>
+              42.8<span className="text-base font-normal text-gray-500 ml-1">km</span>
             </div>
             <div className="text-sm text-gray-600 mb-3 relative z-10">Weekly Distance</div>
             <div className="flex items-center gap-1 text-sm relative z-10">
