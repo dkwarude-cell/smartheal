@@ -7,6 +7,7 @@ const TherapyScreen = () => {
   const [sessionActive, setSessionActive] = useState(false);
   const [intensity, setIntensity] = useState(5);
   const [duration, setDuration] = useState(20);
+  const [selected, setSelected] = useState<string>('');
 
   const bodyParts = [
     { id: 'shoulder', label: 'Shoulder', icon: 'arm-flex' },
@@ -15,77 +16,95 @@ const TherapyScreen = () => {
     { id: 'ankle', label: 'Ankle', icon: 'shoe-print' },
   ];
 
+  const quickPrograms = [
+    { id: 'pain', label: 'Pain Relief', minutes: 20, level: 5 },
+    { id: 'recovery', label: 'Muscle Recovery', minutes: 25, level: 3 },
+  ];
+
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#000000', '#1A1A1A']} style={styles.gradient}>
+      <LinearGradient colors={['#000000', '#0f0f0f', '#121212']} style={styles.gradient}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.title}>Therapy Session</Text>
+          <Text style={styles.subtitle}>Ready to start with guidance</Text>
 
-          {/* Session Status */}
-          <View style={styles.statusCard}>
-            <LinearGradient
-              colors={sessionActive ? ['#00C6AE', '#008C7A'] : ['#2A2A2A', '#1A1A1A']}
-              style={styles.statusGradient}
-            >
-              <Text style={styles.statusText}>
-                {sessionActive ? 'Session Active' : 'Ready to Start'}
-              </Text>
-              <Text style={styles.statusTime}>
-                {sessionActive ? `${duration}:00` : 'Tap to begin'}
-              </Text>
+          <TouchableOpacity
+            style={styles.statusCard}
+            activeOpacity={0.9}
+            onPress={() => setSessionActive((prev) => !prev)}
+          >
+            <LinearGradient colors={['#1f1f1f', '#1a1a1a']} style={styles.statusGradient}>
+              <Text style={styles.statusHint}>Ready to Start</Text>
+              <Text style={styles.statusCTA}>{sessionActive ? 'Tap to stop' : 'Tap to begin'}</Text>
+              <Text style={styles.statusTime}>{sessionActive ? `${duration}:00` : 'Device connects on start'}</Text>
             </LinearGradient>
-          </View>
+          </TouchableOpacity>
 
-          {/* Body Part Selector */}
           <Text style={styles.sectionTitle}>Select Body Part</Text>
           <View style={styles.bodyPartsGrid}>
-            {bodyParts.map((part) => (
-              <TouchableOpacity key={part.id} style={styles.bodyPartCard}>
-                <Icon name={part.icon} size={32} color="#FF0000" />
-                <Text style={styles.bodyPartLabel}>{part.label}</Text>
-              </TouchableOpacity>
-            ))}
+            {bodyParts.map((part) => {
+              const active = selected === part.id;
+              return (
+                <TouchableOpacity
+                  key={part.id}
+                  style={[styles.bodyPartCard, active && styles.bodyPartCardActive]}
+                  onPress={() => setSelected(part.id)}
+                  activeOpacity={0.9}
+                >
+                  <Icon name={part.icon} size={30} color={active ? '#FF4D4D' : '#FF3B3B'} />
+                  <Text style={styles.bodyPartLabel}>{part.label}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          {/* Intensity Control */}
           <Text style={styles.sectionTitle}>Intensity Level</Text>
           <View style={styles.intensityCard}>
             <Text style={styles.intensityValue}>{intensity}</Text>
             <View style={styles.intensityButtons}>
               <TouchableOpacity
                 style={styles.intensityButton}
-                onPress={() => setIntensity(Math.max(1, intensity - 1))}
+                onPress={() => setIntensity((prev) => Math.max(1, prev - 1))}
               >
                 <Icon name="minus" size={24} color="#FFFFFF" />
               </TouchableOpacity>
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${intensity * 10}%` }]} />
+              </View>
               <TouchableOpacity
                 style={styles.intensityButton}
-                onPress={() => setIntensity(Math.min(10, intensity + 1))}
+                onPress={() => setIntensity((prev) => Math.min(10, prev + 1))}
               >
                 <Icon name="plus" size={24} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
+            <View style={styles.intensityLabels}>
+              <Text style={styles.intensityLabelText}>Gentle</Text>
+              <Text style={styles.intensityLabelText}>Moderate</Text>
+              <Text style={styles.intensityLabelText}>Strong</Text>
+            </View>
           </View>
 
-          {/* Start/Stop Button */}
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => setSessionActive(!sessionActive)}
-          >
-            <LinearGradient
-              colors={sessionActive ? ['#FF3B30', '#CC0000'] : ['#FF0000', '#CC0000']}
-              style={styles.buttonGradient}
-            >
-              <Icon
-                name={sessionActive ? 'stop' : 'play'}
-                size={28}
-                color="#FFFFFF"
-              />
-              <Text style={styles.actionButtonText}>
-                {sessionActive ? 'Stop Session' : 'Start Session'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Quick Start Programs</Text>
+          <View style={styles.programList}>
+            {quickPrograms.map((program) => (
+              <TouchableOpacity
+                key={program.id}
+                style={styles.programCard}
+                activeOpacity={0.9}
+                onPress={() => {
+                  setIntensity(program.level);
+                  setDuration(program.minutes);
+                }}
+              >
+                <View>
+                  <Text style={styles.programTitle}>{program.label}</Text>
+                  <Text style={styles.programMeta}>{program.minutes} min · Level {program.level}</Text>
+                </View>
+                <Icon name="chevron-right" size={20} color="#8B8B8B" />
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
       </LinearGradient>
     </View>
@@ -95,23 +114,31 @@ const TherapyScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   gradient: { flex: 1 },
-  scrollContent: { padding: 20, paddingTop: 60 },
-  title: { fontSize: 32, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 24 },
-  statusCard: { marginBottom: 24, borderRadius: 16, overflow: 'hidden' },
-  statusGradient: { padding: 24, alignItems: 'center' },
-  statusText: { fontSize: 18, color: '#FFFFFF', fontWeight: '600', marginBottom: 8 },
-  statusTime: { fontSize: 36, fontWeight: 'bold', color: '#FFFFFF' },
-  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 16 },
-  bodyPartsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 24 },
-  bodyPartCard: { width: '48%', backgroundColor: '#2A2A2A', padding: 20, borderRadius: 12, alignItems: 'center', marginBottom: 12 },
+  scrollContent: { padding: 20, paddingTop: 60, paddingBottom: 40 },
+  title: { fontSize: 32, fontWeight: 'bold', color: '#FFFFFF' },
+  subtitle: { fontSize: 14, color: '#B3B3B3', marginTop: 6, marginBottom: 24 },
+  statusCard: { borderRadius: 16, overflow: 'hidden', marginBottom: 28 },
+  statusGradient: { padding: 20, backgroundColor: '#1c1c1c' },
+  statusHint: { color: '#B3B3B3', fontSize: 13, marginBottom: 6 },
+  statusCTA: { color: '#FFFFFF', fontSize: 22, fontWeight: 'bold' },
+  statusTime: { color: '#8B8B8B', fontSize: 12, marginTop: 4 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 12 },
+  bodyPartsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 20 },
+  bodyPartCard: { width: '48%', backgroundColor: '#1f1f1f', padding: 16, borderRadius: 14, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: '#2a2a2a' },
+  bodyPartCardActive: { borderColor: '#FF4D4D', backgroundColor: '#2a1111' },
   bodyPartLabel: { fontSize: 14, color: '#FFFFFF', marginTop: 8, fontWeight: '600' },
-  intensityCard: { backgroundColor: '#2A2A2A', padding: 24, borderRadius: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  intensityValue: { fontSize: 48, fontWeight: 'bold', color: '#FFFFFF' },
-  intensityButtons: { flexDirection: 'row' },
-  intensityButton: { width: 48, height: 48, backgroundColor: '#FF0000', borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginLeft: 12 },
-  actionButton: { borderRadius: 16, overflow: 'hidden' },
-  buttonGradient: { flexDirection: 'row', paddingVertical: 20, justifyContent: 'center', alignItems: 'center' },
-  actionButtonText: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF', marginLeft: 12 },
+  intensityCard: { backgroundColor: '#1f1f1f', padding: 18, borderRadius: 14, borderWidth: 1, borderColor: '#2a2a2a', marginBottom: 20 },
+  intensityValue: { fontSize: 42, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 14 },
+  intensityButtons: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  intensityButton: { width: 50, height: 50, backgroundColor: '#FF2E2E', borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
+  progressTrack: { flex: 1, height: 6, backgroundColor: '#2f2f2f', borderRadius: 999, marginHorizontal: 12 },
+  progressFill: { height: 6, borderRadius: 999, backgroundColor: '#FF4D4D' },
+  intensityLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
+  intensityLabelText: { color: '#8B8B8B', fontSize: 12 },
+  programList: { gap: 12 },
+  programCard: { backgroundColor: '#1f1f1f', padding: 16, borderRadius: 14, borderWidth: 1, borderColor: '#2a2a2a', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  programTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  programMeta: { color: '#8B8B8B', fontSize: 13, marginTop: 4 },
 });
 
 export default TherapyScreen;

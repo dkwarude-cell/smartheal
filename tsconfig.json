@@ -4,10 +4,12 @@
     "strict": true,
     "target": "esnext",
     "lib": [
-      "esnext"
+      "esnext",
+      "dom",
+      "dom.iterable"
     ],
-    "jsx": "react-native",
-    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -48,26 +50,14 @@
   "include": [
     "App.tsx",
     "index.js",
-    "src/screens/**/*",
-    "src/navigation/**/*",
-    "src/context/**/*",
-    "src/services/**/*",
-    "src/config/**/*",
-    "src/types/**/*",
-    "src/components/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "src/App.tsx",
-    "src/App.tsx.old.web",
-    "src/main.tsx",
     "src/assets/**/*",
     "src/styles/**/*",
     "src/functions/**/*",
     "src/guidelines/**/*",
-    "src/rn-app/**/*",
-    "src/*.tsx",
-    "src/*.ts",
-    "src/*.md"
+    "src/rn-app/**/*"
   ]
 }

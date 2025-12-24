@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { toast } from 'sonner';
 import { 
   Play, Pause, Square, Timer, Zap, Brain, Camera, 
-  Settings, MapPin, Target, Volume2, Smartphone, Mic, Clock 
+  Settings, MapPin, Target, Clock 
 } from 'lucide-react';
 
 // Lazy load heavy components
@@ -40,6 +40,7 @@ interface TherapyProgram {
 }
 
 export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
+  const profileType: 'beginner' | 'athlete' | 'coach' | 'health' = (user?.profileType || 'beginner') as any;
   const [sessionMode, setSessionMode] = useState<'guided' | 'pro'>('guided');
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -195,7 +196,7 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
     setIntensity(program.intensity);
     setTargetDuration(program.duration);
     toast.success(`${program.name} loaded`, {
-      description: `${program.duration / 60} min • Level ${program.intensity}`
+      description: `${program.duration / 60} min  Level ${program.intensity}`
     });
   };
 
@@ -265,36 +266,76 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
     }
   };
 
-  const therapyPrograms: TherapyProgram[] = [
-    { 
-      name: 'Pain Relief', 
-      duration: 1200, // 20 min
-      intensity: 5, 
-      icon: Zap,
-      description: 'Reduce pain and discomfort'
-    },
-    { 
-      name: 'Muscle Recovery', 
-      duration: 1500, // 25 min
-      intensity: 3, 
-      icon: Target,
-      description: 'Speed up muscle recovery'
-    },
-    { 
-      name: 'Stress Relief', 
-      duration: 900, // 15 min
-      intensity: 2, 
-      icon: Brain,
-      description: 'Relax and reduce stress'
-    },
-    { 
-      name: 'Custom Program', 
-      duration: 0, 
-      intensity: 3, 
-      icon: Settings,
-      description: 'Create your own program'
-    }
-  ];
+  const therapyPrograms: TherapyProgram[] = profileType === 'athlete'
+    ? [
+      {
+        name: 'Performance Boost',
+        duration: 1200,
+        intensity: 6,
+        icon: Zap,
+        description: 'Prime before training or competition'
+      },
+      {
+        name: 'Muscle Recovery',
+        duration: 1500,
+        intensity: 3,
+        icon: Target,
+        description: 'Speed up recovery after sessions'
+      },
+      {
+        name: 'Mobility & Warmup',
+        duration: 900,
+        intensity: 2,
+        icon: Brain,
+        description: 'Loosen up and prepare safely'
+      },
+      {
+        name: 'Custom Program',
+        duration: 0,
+        intensity: 3,
+        icon: Settings,
+        description: 'Create your own program'
+      }
+    ]
+    : [
+      {
+        name: 'Pain Relief',
+        duration: 1200,
+        intensity: 5,
+        icon: Zap,
+        description: 'Reduce pain and discomfort'
+      },
+      {
+        name: 'Muscle Recovery',
+        duration: 1500,
+        intensity: 3,
+        icon: Target,
+        description: 'Speed up muscle recovery'
+      },
+      {
+        name: 'Stress Relief',
+        duration: 900,
+        intensity: 2,
+        icon: Brain,
+        description: 'Relax and reduce stress'
+      },
+      {
+        name: 'Custom Program',
+        duration: 0,
+        intensity: 3,
+        icon: Settings,
+        description: 'Create your own program'
+      }
+    ];
+
+  const quickIntensityLevels = [20, 40, 60, 80];
+  const painReliefProgram = therapyPrograms.find((program) => program.name === 'Pain Relief') || therapyPrograms[0];
+
+  const handleQuickIntensity = (percent: number) => {
+    const level = Math.min(10, Math.max(1, Math.round(percent / 10)));
+    setIntensity(level);
+    toast.success(`Intensity set to Level ${level}`);
+  };
 
   // If camera capture is shown, render it full screen
   if (showCameraCapture) {
@@ -334,439 +375,358 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
   }
 
   return (
-    <div className="px-4 space-y-6 pb-24 max-h-screen overflow-y-auto scroll-smooth safe-top">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Therapy Center</h1>
-        <p className="text-gray-600">Personalized ITT therapy sessions</p>
+    <div className="px-4 py-6 space-y-5 lg:space-y-6 pb-24 max-h-screen overflow-y-auto scroll-smooth safe-top">
+      <div className="flex flex-col gap-2 text-center lg:text-left lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Therapy Center</h1>
+          <p className="text-gray-600 text-sm">
+            {profileType === 'athlete' ? 'Optimize performance and recover faster' : 'Guided relief with AI recommendations'}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Badge variant="secondary" className="text-xs">
+            Profile: <span className="ml-1 capitalize">{profileType}</span>
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            Mode: {sessionMode === 'guided' ? 'Guided' : 'Pro'}
+          </Badge>
+          <Badge className={`text-xs ${isDeviceConnected ? 'bg-green-600' : 'bg-amber-500'}`}>
+            {isDeviceConnected ? 'Device connected' : 'Device not connected'}
+          </Badge>
+        </div>
       </div>
 
-      {/* Mode Selection */}
-      <Card className="smart-heal-card">
-        <CardHeader>
-          <CardTitle>Select Session Mode</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Tabs value={sessionMode} onValueChange={(value) => setSessionMode(value as 'guided' | 'pro')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="guided">Guided Mode</TabsTrigger>
-              <TabsTrigger value="pro">Pro Mode</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="guided" className="space-y-4">
-              <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Brain className="w-4 h-4 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-blue-900">AI-Guided Session</h3>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Perfect for beginners. Get real-time placement guidance, automated intensity adjustment, and voice instructions.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <Badge variant="secondary" className="text-xs">Auto-adjustment</Badge>
-                    <Badge variant="secondary" className="text-xs">Voice guidance</Badge>
-                    <Badge variant="secondary" className="text-xs">Safety monitoring</Badge>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="pro" className="space-y-4">
-              <div className="flex items-start space-x-3 p-4 bg-purple-50 rounded-lg">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Settings className="w-4 h-4 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-purple-900">Professional Mode</h3>
-                  <p className="text-sm text-purple-700 mt-1">
-                    For experienced users. Full manual control over all therapy parameters, custom programs, and advanced analytics.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <Badge variant="secondary" className="text-xs">Manual control</Badge>
-                    <Badge variant="secondary" className="text-xs">Custom programs</Badge>
-                    <Badge variant="secondary" className="text-xs">Advanced settings</Badge>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Body Part Selection */}
-      <Card className="smart-heal-card border-red-200 bg-red-50">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Target className="w-5 h-5 text-red-600" />
-            <span className="text-red-900">Target Area Selection</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-red-700">
-            Select the body parts you want to target for therapy
-          </p>
-          
-          {selectedBodyParts.length > 0 ? (
-            <div className="space-y-3">
-              <div className="bg-white rounded-lg p-4 border border-red-200">
-                <h3 className="text-sm font-medium text-red-900 mb-2">
-                  Selected Areas ({selectedBodyParts.length})
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedBodyParts.map((part, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm"
-                    >
-                      {part.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <Button
-                onClick={() => setShowBodySelector(true)}
-                variant="outline"
-                className="w-full border-red-300 text-red-700 hover:bg-red-100"
-              >
-                <MapPin className="w-4 h-4 mr-2" />
-                Change Selection
-              </Button>
-            </div>
-          ) : (
-            <Button
-              onClick={() => setShowBodySelector(true)}
-              className="w-full bg-red-500 hover:bg-red-600 text-white"
-            >
-              <MapPin className="w-4 h-4 mr-2" />
-              Select Body Parts
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* AI Camera Analysis */}
-      {sessionMode === 'guided' && (
-        <Card className="smart-heal-card border-green-200 bg-green-50">
+      <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
+        <Card className="smart-heal-card">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Camera className="w-5 h-5 text-green-600" />
-              <span className="text-green-900">AI Camera Analysis</span>
+            <CardTitle className="flex items-center justify-between">
+              <span>Therapy Session</span>
+              <Tabs value={sessionMode} onValueChange={(value: 'guided' | 'pro') => setSessionMode(value)}>
+                <TabsList className="grid grid-cols-2">
+                  <TabsTrigger value="guided">Guided</TabsTrigger>
+                  <TabsTrigger value="pro">Pro</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-green-700">
-              Capture a photo of the affected area and get AI-powered therapy recommendations
-            </p>
-            
-            {therapyAnalysis && (
-              <div className="p-3 bg-white rounded-lg border border-green-300 mb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-green-900">Last Analysis</span>
-                  <Badge className="bg-green-600 text-white">{therapyAnalysis.confidence}%</Badge>
-                </div>
-                <p className="text-sm text-gray-700">
-                  {therapyAnalysis.bodyPart} • Level {therapyAnalysis.recommendedIntensity} • {therapyAnalysis.duration}min
-                </p>
+            {!isDeviceConnected && (
+              <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50 p-3 text-sm text-amber-700">
+                Connect your SmartHeal device to start a session.
               </div>
             )}
-            
-            <div className="grid grid-cols-2 gap-3">
-              <Button 
-                onClick={() => setShowCameraCapture(true)}
-                className="bg-green-600 hover:bg-green-700 text-white"
+
+            <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={() => {
+                  if (isSessionActive) {
+                    if (isPaused) {
+                      handleResumeSession();
+                    } else {
+                      handlePauseSession();
+                    }
+                  } else {
+                    handleStartSession();
+                  }
+                }}
+                disabled={!isDeviceConnected}
+                className={`flex-1 min-w-[140px] ${isSessionActive && !isPaused ? 'bg-orange-500 hover:bg-orange-600' : 'smart-heal-primary-btn'} text-white`}
               >
-                <Camera className="w-4 h-4 mr-2" />
-                Capture Photo
+                {isSessionActive ? (
+                  isPaused ? (
+                    <>
+                      <Play className="w-5 h-5 mr-2" />
+                      Resume session
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="w-5 h-5 mr-2" />
+                      Pause session
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Play className="w-5 h-5 mr-2" />
+                    Start therapy session
+                  </>
+                )}
               </Button>
-              
-              <Button 
-                variant="outline" 
-                className="border-green-300 text-green-700 hover:bg-green-100"
-                onClick={() => setShowBodySelector(true)}
+
+              <Button
+                variant="outline"
+                className="min-w-[110px]"
+                disabled={!isDeviceConnected || !isSessionActive}
+                onClick={handleStopSession}
               >
-                <MapPin className="w-4 h-4 mr-2" />
-                Manual Select
+                <Square className="w-4 h-4 mr-2" />
+                Stop
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => setShowTimerDialog(true)}
+                className="min-w-[120px]"
+              >
+                <Timer className="w-4 h-4 mr-2" />
+                Set time {Math.floor(targetDuration / 60)}m
               </Button>
             </div>
-            
-            <div className="text-center p-4 bg-white rounded-lg border border-green-200">
-              <Target className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-sm text-green-700">AI Accuracy: 94.2%</p>
-              <p className="text-xs text-green-600">Powered by Vertex AI</p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                <p className="text-xs uppercase text-gray-500">Session time</p>
+                <div className="text-3xl font-semibold text-gray-900">{formatTime(sessionTime)}</div>
+                {isSessionActive && (
+                  <p className="mt-1 text-xs text-blue-700">
+                    {isPaused ? 'Paused' : 'Active'} • {formatTime(Math.max(targetDuration - sessionTime, 0))} remaining
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700">Intensity</span>
+                  <Badge variant="outline">Level {intensity}</Badge>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {quickIntensityLevels.map((value) => (
+                    <Button
+                      key={value}
+                      size="sm"
+                      variant="outline"
+                      className={`flex-1 min-w-[60px] ${Math.round(intensity * 10) === value ? 'border-blue-500 bg-blue-50' : ''}`}
+                      onClick={() => handleQuickIntensity(value)}
+                      disabled={!isDeviceConnected}
+                    >
+                      {value}
+                    </Button>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="min-w-[60px]"
+                    onClick={handleIncreaseIntensity}
+                    disabled={!isDeviceConnected || intensity >= 10}
+                  >
+                    +
+                  </Button>
+                </div>
+                <Progress value={intensity * 10} className="h-2" />
+                <p className="text-xs text-gray-500">Gentle · Moderate · Strong</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between rounded-lg border border-gray-100 bg-white p-4">
+              <div>
+                <p className="text-xs uppercase text-gray-500">Body parts selected</p>
+                {selectedBodyParts.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {selectedBodyParts.map((part, index) => (
+                      <span key={index} className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700">
+                        {part.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600">No body parts selected yet.</p>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setShowBodySelector(true)}>
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Edit body parts
+                </Button>
+                {painReliefProgram && (
+                  <Button
+                    size="sm"
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    disabled={!isDeviceConnected}
+                    onClick={() => handleQuickProgram(painReliefProgram)}
+                  >
+                    Target Pain
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Session Control */}
-      <Card className="smart-heal-card">
-        <CardHeader>
-          <CardTitle>Session Control</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Connection Status */}
-          {!isDeviceConnected && (
-            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-gray-600 mb-2">Device not connected</p>
-              <Button variant="outline" size="sm">
-                Connect Device
-              </Button>
-            </div>
-          )}
+        {sessionMode === 'guided' && (
+          <Card className="smart-heal-card">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Camera className="w-5 h-5 text-blue-600" />
+                <span>AI Camera Analysis</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Capture with AI to get placement and intensity recommendations.
+              </p>
 
-          {/* Session Timer */}
-          <div className="text-center">
-            <div className="text-4xl font-bold text-gray-900 mb-2">
-              {formatTime(sessionTime)}
-            </div>
-            <p className="text-gray-500">Session Duration</p>
-          </div>
-
-          {/* Session Status */}
-          {isSessionActive && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-blue-900">
-                    {isPaused ? 'Session Paused' : 'Session Active'}
-                  </span>
-                </div>
-                <span className="text-sm text-blue-700">
-                  {formatTime(targetDuration - sessionTime)} remaining
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Intensity Control */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-700">Intensity Level</span>
-              <Badge variant="outline">Level {intensity}</Badge>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleDecreaseIntensity}
-                disabled={!isDeviceConnected || intensity <= 1}
-              >
-                -
-              </Button>
-              <div className="flex-1">
-                <Progress value={intensity * 10} className="h-2" />
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleIncreaseIntensity}
-                disabled={!isDeviceConnected || intensity >= 10}
-              >
-                +
-              </Button>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Gentle</span>
-              <span>Moderate</span>
-              <span>Strong</span>
-            </div>
-          </div>
-
-          {/* Control Buttons */}
-          <div className="grid grid-cols-3 gap-3">
-            <Button
-              onClick={() => {
-                if (isSessionActive) {
-                  if (isPaused) {
-                    handleResumeSession();
-                  } else {
-                    handlePauseSession();
-                  }
-                } else {
-                  handleStartSession();
-                }
-              }}
-              disabled={!isDeviceConnected}
-              className={`h-12 ${isSessionActive && !isPaused ? 'bg-orange-500 hover:bg-orange-600' : 'smart-heal-primary-btn'} text-white`}
-            >
-              {isSessionActive ? (
-                isPaused ? (
-                  <>
-                    <Play className="w-5 h-5 mr-2" />
-                    Resume
-                  </>
-                ) : (
-                  <>
-                    <Pause className="w-5 h-5 mr-2" />
-                    Pause
-                  </>
-                )
-              ) : (
-                <>
-                  <Play className="w-5 h-5 mr-2" />
-                  Start
-                </>
-              )}
-            </Button>
-            
-            <Button
-              variant="outline"
-              disabled={!isDeviceConnected || !isSessionActive}
-              className="h-12"
-              onClick={handleStopSession}
-            >
-              <Square className="w-5 h-5 mr-2" />
-              Stop
-            </Button>
-            
-            <Button
-              variant="outline"
-              disabled={!isDeviceConnected}
-              className="h-12"
-              onClick={() => setShowTimerDialog(true)}
-            >
-              <Timer className="w-5 h-5 mr-2" />
-              Timer
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Session Presets */}
-      <Card className="smart-heal-card">
-        <CardHeader>
-          <CardTitle>Quick Start Programs</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {therapyPrograms.map((program, index) => (
-            <div 
-              key={index} 
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-              onClick={() => program.duration > 0 && handleQuickProgram(program)}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <program.icon className="w-4 h-4 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">{program.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {program.duration > 0 ? `${program.duration / 60} min` : 'Variable'} • 
-                    Level {program.intensity}
+              {therapyAnalysis && (
+                <div className="rounded-lg border border-blue-100 bg-blue-50 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-blue-900">Last analysis</span>
+                    <Badge className="bg-blue-600 text-white">{therapyAnalysis.confidence}%</Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-blue-800">
+                    {therapyAnalysis.bodyPart} • Level {therapyAnalysis.recommendedIntensity} • {therapyAnalysis.duration}m
                   </p>
                 </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowCameraCapture(true)}>
+                  <Camera className="w-4 h-4 mr-2" />
+                  Capture with AI
+                </Button>
+                <Button variant="outline" onClick={() => setShowBodySelector(true)}>
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Manual select
+                </Button>
               </div>
-              <Button 
-                size="sm" 
-                variant="outline"
-                disabled={!isDeviceConnected}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleQuickProgram(program);
-                }}
+
+              <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600">
+                AI accuracy: 94.2% • Vertex AI powered
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+        <Card className="smart-heal-card">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Target className="w-5 h-5 text-red-600" />
+              <span>Target Selection</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">Select the zones you want to focus on.</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Glutes', value: 'glutes' },
+                { label: 'Back', value: 'back' },
+                { label: 'Legs', value: 'legs' },
+                { label: 'Abdominals', value: 'abdominals' }
+              ].map(({ label, value }) => (
+                <Button
+                  key={value}
+                  variant="outline"
+                  size="sm"
+                  className={selectedBodyParts.includes(value) ? 'border-blue-500 bg-blue-50' : ''}
+                  onClick={() => {
+                    const updated = selectedBodyParts.includes(value)
+                      ? selectedBodyParts.filter((item) => item !== value)
+                      : Array.from(new Set([...selectedBodyParts, value]));
+                    setSelectedBodyParts(updated);
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+
+            <div className="rounded-lg border border-gray-100 bg-white p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase text-gray-500">Current target</p>
+                  <p className="text-sm font-medium text-gray-900">{selectedBodyParts[0] ? selectedBodyParts[0].replace(/\b\w/g, (l) => l.toUpperCase()) : 'None selected'}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowBodySelector(true)}>
+                  Edit selection
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="smart-heal-card">
+          <CardHeader>
+            <CardTitle>Session Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Body</p>
+              <p className="text-sm font-semibold text-gray-900">{therapyAnalysis?.bodyPart || (selectedBodyParts[0] ? selectedBodyParts[0].replace(/\b\w/g, (l) => l.toUpperCase()) : 'Not set')}</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Target</p>
+              <p className="text-sm font-semibold text-gray-900">{painReliefProgram?.name || 'Pain Relief'}</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Duration</p>
+              <p className="text-sm font-semibold text-gray-900">{Math.floor(targetDuration / 60)} min</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Intensity</p>
+              <p className="text-sm font-semibold text-gray-900">Level {intensity}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+        <Card className="smart-heal-card xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Quick Start Programs</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {therapyPrograms.map((program, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between rounded-lg border border-gray-100 bg-white p-3 hover:bg-gray-50 transition"
               >
-                Load
-              </Button>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Voice Control */}
-      <Card className="smart-heal-card border-purple-200 bg-purple-50">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Volume2 className="w-5 h-5 text-purple-600" />
-            <span className="text-purple-900">Voice Control</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-purple-700">
-            Control your therapy session hands-free with voice commands
-          </p>
-
-          {/* Voice Status */}
-          {isVoiceListening && (
-            <div className="p-3 bg-purple-100 border border-purple-300 rounded-lg animate-pulse">
-              <div className="flex items-center space-x-2">
-                <Mic className="w-4 h-4 text-purple-700 animate-pulse" />
-                <span className="text-sm font-medium text-purple-900">
-                  {voiceCommand ? `Recognized: "${voiceCommand}"` : 'Listening...'}
-                </span>
-              </div>
-            </div>
-          )}
-          
-          <div className="grid grid-cols-2 gap-3">
-            <Button 
-              variant="outline" 
-              className={`border-purple-300 text-purple-700 hover:bg-purple-100 ${isVoiceListening ? 'bg-purple-200' : ''}`}
-              disabled={!isDeviceConnected || isVoiceListening}
-              onClick={handleVoiceControl}
-            >
-              <Mic className="w-4 h-4 mr-2" />
-              {isVoiceListening ? 'Listening...' : 'Start Listening'}
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="border-purple-300 text-purple-700 hover:bg-purple-100"
-              onClick={() => {
-                toast.info('Available Commands', {
-                  description: 'Start/Pause/Stop session, Increase/Decrease intensity'
-                });
-              }}
-            >
-              <Smartphone className="w-4 h-4 mr-2" />
-              Commands
-            </Button>
-          </div>
-          
-          <div className="text-xs text-purple-600 space-y-1">
-            <p>• "Start session" • "Increase intensity"</p>
-            <p>• "Pause session" • "Decrease intensity"</p>
-            <p>• "Stop session"</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Session History */}
-      <Card className="smart-heal-card">
-        <CardHeader>
-          <CardTitle>Recent Sessions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {[
-            { date: 'Today 2:30 PM', duration: '23 min', program: 'Pain Relief', rating: 4 },
-            { date: 'Today 9:15 AM', duration: '20 min', program: 'Muscle Recovery', rating: 5 },
-            { date: 'Yesterday 7:45 PM', duration: '25 min', program: 'Stress Relief', rating: 4 }
-          ].map((session, index) => (
-            <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-              <div>
-                <h3 className="font-medium text-gray-900">{session.program}</h3>
-                <p className="text-sm text-gray-500">{session.date} • {session.duration}</p>
-              </div>
-              <div className="text-right">
-                <div className="flex space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className={`text-xs ${i < session.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
-                      ⭐
-                    </span>
-                  ))}
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                    <program.icon className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{program.name}</p>
+                    <p className="text-sm text-gray-600">{program.duration > 0 ? `${program.duration / 60} min` : 'Variable'} • Level {program.intensity}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!isDeviceConnected}
+                    onClick={() => handleQuickProgram(program)}
+                  >
+                    Load
+                  </Button>
+                  {program.name === 'Custom Program' && (
+                    <Badge variant="secondary" className="text-xs">Pro</Badge>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
-          
-          <Button variant="outline" className="w-full">
-            View All Sessions
-          </Button>
-        </CardContent>
-      </Card>
+            ))}
+          </CardContent>
+        </Card>
 
-      {/* Timer Dialog */}
+        <Card className="smart-heal-card">
+          <CardHeader>
+            <CardTitle>This Week</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Session time</p>
+              <p className="text-xl font-semibold text-gray-900">4h</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Performance</p>
+              <p className="text-xl font-semibold text-gray-900">72%</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs uppercase text-gray-500">Recovery</p>
+              <p className="text-xl font-semibold text-gray-900">86%</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Dialog open={showTimerDialog} onOpenChange={setShowTimerDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -780,7 +740,6 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Quick Timer Presets */}
             <div className="grid grid-cols-3 gap-3">
               {[10, 15, 20, 25, 30, 45].map((minutes) => (
                 <Button
@@ -800,7 +759,6 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
               ))}
             </div>
 
-            {/* Custom Timer Input */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Custom Duration (minutes)</label>
               <div className="flex items-center space-x-2">
@@ -821,7 +779,6 @@ export function TherapyTab({ user, isDeviceConnected }: TherapyTabProps) {
               </div>
             </div>
 
-            {/* Current Selection */}
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-blue-700">Selected Duration:</span>

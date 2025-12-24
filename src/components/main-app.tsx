@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 // Lazy load tab components
 const HomeTab = lazy(() => import('./home-tab').then(m => ({ default: m.HomeTab })));
 const TherapyTab = lazy(() => import('./therapy-tab').then(m => ({ default: m.TherapyTab })));
+const AthleteTherapyTab = lazy(() => import('./athlete/athlete-therapy-tab').then(m => ({ default: m.AthleteTherapyTab })));
 const ReportsTab = lazy(() => import('./reports-tab').then(m => ({ default: m.ReportsTab })));
 const AIAssistantTab = lazy(() => import('./ai-assistant-tab').then(m => ({ default: m.AIAssistantTab })));
 const VoiceAssistant = lazy(() => import('./voice-assistant').then(m => ({ default: m.VoiceAssistant })));
@@ -121,7 +122,15 @@ export function MainApp({ user, isDeviceConnected, onDeviceConnection, onUserUpd
       case 'therapy':
         return (
           <Suspense fallback={<TabLoader />}>
-            <TherapyTab user={userData} isDeviceConnected={isDeviceConnected} />
+            {userData?.profileType === 'athlete' ? (
+              <AthleteTherapyTab
+                sessions={userData?.sessions}
+                onStartNew={() => setActiveTab('therapy')}
+                onConnectDevice={() => onDeviceConnection?.(true)}
+              />
+            ) : (
+              <TherapyTab user={userData} isDeviceConnected={isDeviceConnected} />
+            )}
           </Suspense>
         );
       case 'reports':

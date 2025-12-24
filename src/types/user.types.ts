@@ -108,3 +108,17 @@ export interface DeviceInfo {
   totalSessions: number;
   totalDuration: number; // in seconds
 }
+
+// Multi-profile base types
+export type ProfileType = 'athlete' | 'coach' | 'health';
+
+export interface BaseUser {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  profileType: ProfileType;
+  avatar?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
