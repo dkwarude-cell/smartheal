@@ -21,8 +21,9 @@ const DeviceConnectionScreen: React.FC<DeviceConnectionScreenProps> = () => {
     await login({
       uid: '123',
       email: 'user@example.com',
-      displayName: 'Test User',
+      displayName: 'Sarah Johnson',
       phoneNumber: '+1234567890',
+      profileType: 'coach',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       emailVerified: true,

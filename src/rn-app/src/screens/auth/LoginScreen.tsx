@@ -70,6 +70,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         email,
         displayName: 'User',
         phoneNumber: '+1234567890',
+        profileType: email.toLowerCase().includes('coach')
+          ? 'coach'
+          : email.toLowerCase().includes('athlete')
+            ? 'athlete'
+            : 'health',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         emailVerified: true,

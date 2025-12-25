@@ -51,38 +51,67 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const AppNavigator = () => {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
 
   if (loading) {
     return null; // Or a loading screen
   }
 
+  const isSignedIn = !!user;
+  const hasProfileType = !!user?.profileType;
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Start"
+        initialRouteName={isSignedIn ? (hasProfileType ? 'MainApp' : 'ProfileType') : 'Start'}
         screenOptions={{
           headerShown: false,
           animation: 'fade',
           contentStyle: { backgroundColor: '#FFF5EF' },
         }}
       >
-        <Stack.Screen name="Start" component={StartScreen} />
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Signup" component={SignupScreen} />
-        <Stack.Screen name="OTP" component={OTPScreen} />
-        <Stack.Screen name="ProfileType" component={ProfileTypeSelectionScreen} />
-        <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
-        <Stack.Screen name="Interests" component={InterestsSelectionScreen} />
-        <Stack.Screen name="DeviceConnection" component={DeviceConnectionScreen} />
-        <Stack.Screen name="ConnectionSuccess" component={ConnectionSuccessScreen} />
-        <Stack.Screen name="SetupComplete" component={SetupCompleteScreen} />
-        <Stack.Screen name="MainApp" component={MainTabNavigator} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
-        <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
-        <Stack.Screen name="Goals" component={GoalsScreen} />
+        {!isSignedIn ? (
+          <>
+            <Stack.Screen name="Start" component={StartScreen} />
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen name="OTP" component={OTPScreen} />
+            <Stack.Screen name="ProfileType" component={ProfileTypeSelectionScreen} />
+            <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
+            <Stack.Screen name="Interests" component={InterestsSelectionScreen} />
+            <Stack.Screen name="DeviceConnection" component={DeviceConnectionScreen} />
+            <Stack.Screen name="ConnectionSuccess" component={ConnectionSuccessScreen} />
+            <Stack.Screen name="SetupComplete" component={SetupCompleteScreen} />
+            <Stack.Screen name="MainApp" component={MainTabNavigator} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
+            <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
+            <Stack.Screen name="Goals" component={GoalsScreen} />
+          </>
+        ) : !hasProfileType ? (
+          <>
+            <Stack.Screen name="ProfileType" component={ProfileTypeSelectionScreen} />
+            <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
+            <Stack.Screen name="Interests" component={InterestsSelectionScreen} />
+            <Stack.Screen name="DeviceConnection" component={DeviceConnectionScreen} />
+            <Stack.Screen name="ConnectionSuccess" component={ConnectionSuccessScreen} />
+            <Stack.Screen name="SetupComplete" component={SetupCompleteScreen} />
+            <Stack.Screen name="MainApp" component={MainTabNavigator} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
+            <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
+            <Stack.Screen name="Goals" component={GoalsScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="MainApp" component={MainTabNavigator} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
+            <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
+            <Stack.Screen name="Goals" component={GoalsScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

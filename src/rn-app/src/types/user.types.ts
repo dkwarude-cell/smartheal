@@ -30,6 +30,7 @@ export interface UserProfile {
   displayName: string;
   phoneNumber: string;
   photoURL?: string;
+  profileType?: 'athlete' | 'coach' | 'health';
   createdAt: string;
   updatedAt: string;
   emailVerified: boolean;

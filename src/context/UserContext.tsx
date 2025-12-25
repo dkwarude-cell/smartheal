@@ -59,8 +59,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         throw new Error(data.message);
       }
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -83,8 +81,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         throw new Error(data.message);
       }
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }

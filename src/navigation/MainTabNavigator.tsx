@@ -8,6 +8,10 @@ import HomeScreen from '../screens/HomeScreen';
 import TherapyScreen from '../screens/TherapyScreen';
 import AIAssistantScreen from '../screens/AIAssistantScreen';
 import ReportsScreen from '../screens/ReportsScreen';
+import CoachHomeScreen from '../screens/CoachHomeScreen';
+import HealthHomeScreen from '../screens/HealthHomeScreen';
+import VoiceAssistantScreen from '../screens/VoiceAssistantScreen';
+import { useAuth } from '../context/AuthContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +27,10 @@ const TabIcon = ({ focused, iconName, label }: { focused: boolean; iconName: str
 );
 
 export const MainTabNavigator = () => {
+  const { user } = useAuth();
+  const profileType = user?.profileType ?? 'athlete';
+  const RoleHome = profileType === 'coach' ? CoachHomeScreen : profileType === 'health' ? HealthHomeScreen : HomeScreen;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -52,7 +60,7 @@ export const MainTabNavigator = () => {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={RoleHome}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} iconName="home-outline" label="Home" />
@@ -83,6 +91,16 @@ export const MainTabNavigator = () => {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} iconName="robot-outline" label="AI" />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Voice"
+        component={VoiceAssistantScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} iconName="microphone-outline" label="Voice" />
           ),
         }}
       />

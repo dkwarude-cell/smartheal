@@ -5,7 +5,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'react-native'],
   parserOptions: {
     ecmaVersion: 2021,
     sourceType: 'module',
@@ -23,4 +23,18 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
   },
+  overrides: [
+    {
+      files: ['*.js', '*.cjs', '*.mjs'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+    {
+      files: ['**/navigation.types.ts'],
+      rules: {
+        '@typescript-eslint/no-namespace': 'off',
+      },
+    },
+  ],
 };

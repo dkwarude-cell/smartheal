@@ -5,11 +5,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { Button } from '../ui/button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
 const OTPScreen = ({ navigation, route }: Props) => {
   const { email } = route.params;
+  const { user } = useAuth();
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const inputsRef = useRef<Array<TextInput | null>>([]);
   const [counter, setCounter] = useState(30);
@@ -47,6 +49,13 @@ const OTPScreen = ({ navigation, route }: Props) => {
       Alert.alert('Incomplete Code', 'Please enter the 6-digit code.');
       return;
     }
+
+    // If the user already picked a profile type previously, skip selection.
+    if (user?.profileType) {
+      navigation.reset({ index: 0, routes: [{ name: 'MainApp' }] });
+      return;
+    }
+
     navigation.navigate('ProfileType');
   };
 

@@ -16,6 +16,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
@@ -46,14 +47,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Subscribe to auth state changes
     const unsubscribe = authService.onAuthStateChanged((firebaseUser) => {
       if (firebaseUser) {
-        const userData: User = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-        };
-        setUser(userData);
-        AsyncStorage.setItem('@user', JSON.stringify(userData));
+        (async () => {
+          try {
+            const savedUser = await AsyncStorage.getItem('@user');
+            const parsedSavedUser = savedUser ? (JSON.parse(savedUser) as Partial<User>) : null;
+
+            const userData: User = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              photoURL: firebaseUser.photoURL,
+              profileType: parsedSavedUser?.profileType,
+            };
+
+            setUser(userData);
+            await AsyncStorage.setItem('@user', JSON.stringify(userData));
+          } catch (error) {
+            console.error('Error syncing auth user:', error);
+          }
+        })();
       } else {
         setUser(null);
         AsyncStorage.removeItem('@user');
@@ -64,30 +76,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    try {
-      await authService.signInWithEmail(email, password);
-    } catch (error) {
-      throw error;
-    }
+    await authService.signInWithEmail(email, password);
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      await authService.signUpWithEmail(email, password);
-    } catch (error) {
-      throw error;
-    }
+    await authService.signUpWithEmail(email, password);
   };
 
   const signOut = async () => {
-    try {
-      await authService.signOut();
-      setUser(null);
-      await AsyncStorage.clear();
-    } catch (error) {
-      throw error;
-    }
+    await authService.signOut();
+    setUser(null);
+    await AsyncStorage.clear();
   };
+
+  const logout = signOut;
 
   const updateProfile = async (data: Partial<User>) => {
     if (!user) return;
@@ -98,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProfileType'>;
 
@@ -32,6 +33,8 @@ const profileCards = [
 ];
 
 const ProfileTypeSelectionScreen = ({ navigation }: Props) => {
+  const { updateProfile } = useAuth();
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -51,7 +54,10 @@ const ProfileTypeSelectionScreen = ({ navigation }: Props) => {
               key={card.type}
               style={styles.card}
               activeOpacity={0.9}
-              onPress={() => navigation.navigate('ProfileDetails', { profileType: card.type })}
+              onPress={async () => {
+                await updateProfile({ profileType: card.type });
+                navigation.navigate('ProfileDetails', { profileType: card.type });
+              }}
             >
               <LinearGradient colors={['#FF5F6D', '#FF7E33']} style={styles.cardIconBg}>
                 <Icon name={card.icon} size={28} color="#FFFFFF" />
