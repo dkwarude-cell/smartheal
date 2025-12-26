@@ -53,7 +53,7 @@ const SignupScreen = ({ navigation }: Props) => {
 
     setLoading(true);
     try {
-      await signUp(email, password);
+      await signUp(email, password, fullName);
       navigation.navigate('OTP', { email });
     } catch (error: any) {
       Alert.alert('Signup Failed', error.message || 'Could not create account');

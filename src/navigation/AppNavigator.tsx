@@ -19,6 +19,9 @@ import SetupCompleteScreen from '../screens/SetupCompleteScreen';
 import DeviceConnectionScreen from '../screens/DeviceConnectionScreen';
 import ConnectionSuccessScreen from '../screens/ConnectionSuccessScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import PerformanceOverviewScreen from '../screens/PerformanceOverviewScreen';
+import AICameraCaptureScreen from '../screens/AICameraCaptureScreen';
+import AIAnalysisResultsScreen from '../screens/AIAnalysisResultsScreen';
 
 // Main App
 import { MainTabNavigator } from './MainTabNavigator';
@@ -46,6 +49,13 @@ export type RootStackParamList = {
   DeviceConnection: undefined;
   ConnectionSuccess: undefined;
   MainApp: undefined;
+  PerformanceOverview: undefined;
+  AICameraCapture: undefined;
+  AIAnalysisResults: {
+    imageUri?: string;
+    imageBase64?: string;
+    additionalInfo?: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -88,6 +98,9 @@ export const AppNavigator = () => {
             <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
             <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
             <Stack.Screen name="Goals" component={GoalsScreen} />
+            <Stack.Screen name="PerformanceOverview" component={PerformanceOverviewScreen} />
+            <Stack.Screen name="AICameraCapture" component={AICameraCaptureScreen} />
+            <Stack.Screen name="AIAnalysisResults" component={AIAnalysisResultsScreen} />
           </>
         ) : !hasProfileType ? (
           <>
@@ -102,6 +115,9 @@ export const AppNavigator = () => {
             <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
             <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
             <Stack.Screen name="Goals" component={GoalsScreen} />
+            <Stack.Screen name="PerformanceOverview" component={PerformanceOverviewScreen} />
+            <Stack.Screen name="AICameraCapture" component={AICameraCaptureScreen} />
+            <Stack.Screen name="AIAnalysisResults" component={AIAnalysisResultsScreen} />
           </>
         ) : (
           <>
@@ -110,6 +126,9 @@ export const AppNavigator = () => {
             <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
             <Stack.Screen name="MedicalHistory" component={MedicalHistoryScreen} />
             <Stack.Screen name="Goals" component={GoalsScreen} />
+            <Stack.Screen name="PerformanceOverview" component={PerformanceOverviewScreen} />
+            <Stack.Screen name="AICameraCapture" component={AICameraCaptureScreen} />
+            <Stack.Screen name="AIAnalysisResults" component={AIAnalysisResultsScreen} />
           </>
         )}
       </Stack.Navigator>

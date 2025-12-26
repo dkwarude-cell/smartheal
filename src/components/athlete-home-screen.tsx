@@ -204,29 +204,73 @@ export function AthleteHomeScreen({ userName, level }: AthleteHomeScreenProps) {
           </div>
         </div>
 
-        {/* Upcoming Sessions */}
+        {/* Recovery Readiness Card */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Upcoming Therapy Sessions</h2>
-          <div className="space-y-3">
-            {upcomingSessions.map((session, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedSession(session)}
-                className="w-full hover:bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between transition-colors"
-                style={{ backgroundColor: '#ffffff' }}
+          <div 
+            className="rounded-3xl p-6 shadow-lg relative overflow-hidden"
+            style={{ 
+              backgroundColor: '#1e293b',
+              backgroundImage: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-1">Recovery Readiness</h2>
+                <p className="text-gray-400 text-sm">Updated 2 hours ago</p>
+              </div>
+              <div className="text-right">
+                <div className="text-5xl font-bold text-white mb-1">87%</div>
+                <div className="flex items-center gap-1 text-green-400 text-sm font-medium">
+                  <span>↑</span>
+                  <span>+5% today</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mb-6 h-3 rounded-full overflow-hidden bg-gray-700">
+              <div 
+                className="h-full rounded-full"
+                style={{
+                  width: '87%',
+                  background: 'linear-gradient(90deg, #10b981 0%, #22d3ee 50%, #a855f7 100%)'
+                }}
+              />
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              {/* Muscle Card */}
+              <div 
+                className="rounded-2xl p-4 text-center"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
               >
-                <div className="text-left">
-                  <p className="font-medium text-gray-900">{session.type} Session</p>
-                  <p className="text-sm text-gray-500">{session.time}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900">{session.duration}</p>
-                  <p className={`text-sm ${session.intensity === 'High' ? 'text-orange-500' : 'text-green-500'}`}>
-                    {session.intensity} Intensity
-                  </p>
-                </div>
-              </button>
-            ))}
+                <div className="text-3xl mb-2">💪</div>
+                <div className="text-white font-medium text-sm mb-1">Muscle</div>
+                <div className="text-gray-300 text-xs">Good</div>
+              </div>
+
+              {/* Sleep Card */}
+              <div 
+                className="rounded-2xl p-4 text-center"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+              >
+                <div className="text-3xl mb-2">😴</div>
+                <div className="text-white font-medium text-sm mb-1">Sleep</div>
+                <div className="text-gray-300 text-xs">7.5h</div>
+              </div>
+
+              {/* HRV Card */}
+              <div 
+                className="rounded-2xl p-4 text-center"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+              >
+                <div className="text-3xl mb-2">❤️</div>
+                <div className="text-white font-medium text-sm mb-1">HRV</div>
+                <div className="text-gray-300 text-xs">Optimal</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

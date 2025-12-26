@@ -8,7 +8,9 @@ import {
   Platform,
   ScrollView,
   Alert,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -44,22 +46,20 @@ const LoginScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <LinearGradient colors={['#FFF5EF', '#FFFFFF']} style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.topBar}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Icon name="arrow-left" size={22} color="#1F2937" />
-              <Text style={styles.backText}>Back</Text>
-            </TouchableOpacity>
-            <View style={styles.brandRow}>
-              <Icon name="heart" size={22} color="#F52E32" />
-              <Text style={styles.brandText}>SmartHeal</Text>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF5EF" />
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <LinearGradient colors={['#FFF5EF', '#FFFFFF']} style={styles.gradient}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.topBar}>
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Icon name="arrow-left" size={22} color="#1F2937" />
+                <Text style={styles.backText}>Back</Text>
+              </TouchableOpacity>
             </View>
-          </View>
 
           <View style={styles.header}>
             <Text style={styles.title}>Welcome Back</Text>
@@ -136,12 +136,17 @@ const LoginScreen = ({ navigation }: Props) => {
           </View>
         </ScrollView>
       </LinearGradient>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#FFF5EF',
+  },
+  keyboardView: {
     flex: 1,
   },
   gradient: {

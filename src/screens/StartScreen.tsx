@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const SmartHealLogo = require('../assets/smartheal-logo.png');
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Start'>;
 
@@ -12,32 +14,20 @@ const StartScreen = ({ navigation }: Props) => {
     { label: 'AI Guidance', icon: 'flash', color: '#FF6B6B', bg: '#FFECEC' },
     { label: 'Safe Therapy', icon: 'shield-check', color: '#5B8DEF', bg: '#EAF1FF' },
     { label: 'Health Tracking', icon: 'heart-pulse', color: '#4CAF50', bg: '#E8F8ED' },
-    { label: 'Voice Control', icon: 'microphone', color: '#C084FC', bg: '#F3E8FF' },
+    { label: 'Voice Control', icon: 'phone-outline', color: '#C084FC', bg: '#F3E8FF' },
   ];
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <LinearGradient colors={['#FFF4EC', '#FFFFFF']} style={styles.gradient}>
-        <View style={styles.headerRow}>
-          <View style={styles.logoRow}>
-            <View style={styles.logoIconWrapper}>
-              <Icon name="heart" size={22} color="#FF3B30" />
-            </View>
-            <Text style={styles.logoText}>SmartHeal</Text>
-          </View>
-          <Text style={styles.brandTag}>by Runverve</Text>
-        </View>
-
         <View style={styles.hero}>
           <View style={styles.heroIconWrapper}>
-            <LinearGradient colors={['#FF5F6D', '#FF7E33']} style={styles.heroIconBg}>
-              <Icon name="heart-outline" size={50} color="#FFFFFF" />
-            </LinearGradient>
+            <Image source={SmartHealLogo} style={styles.logoImage} resizeMode="contain" />
           </View>
           <Text style={styles.title}>Welcome to SmartHeal</Text>
           <Text style={styles.subtitle}>
-            Professional ITT therapy device with AI-powered guidance and personalized treatment plans
+            Professional IFT therapy device with AI-powered guidance and personalized treatment plans
           </Text>
         </View>
 
@@ -91,58 +81,21 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 60,
     paddingBottom: 28,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  logoIconWrapper: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    backgroundColor: '#FFE1DC',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  brandTag: {
-    color: '#6B7280',
-    fontSize: 13,
-    fontWeight: '500',
   },
   hero: {
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 24,
     paddingHorizontal: 10,
   },
   heroIconWrapper: {
-    marginBottom: 18,
+    marginBottom: 24,
   },
-  heroIconBg: {
-    width: 120,
-    height: 120,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#FF6B6B',
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
+  logoImage: {
+    width: 140,
+    height: 140,
   },
   title: {
     fontSize: 26,

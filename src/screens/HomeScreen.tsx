@@ -1,10 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Animated, Dimensions, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal, Animated, Dimensions, Pressable, StatusBar, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAuth } from '../context/AuthContext';
 import { useDevice } from '../context/DeviceContext';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+const SmartHealLogo = require('../assets/smartheal-logo.png');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DRAWER_WIDTH = SCREEN_WIDTH * 0.8;
@@ -13,7 +17,16 @@ const HomeScreen = () => {
   const { user, logout } = useAuth();
   const { isConnected } = useDevice();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const handleLogout = async () => {
+    setDrawerOpen(false);
+    await logout?.();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Start' }],
+    });
+  };
 
   const name = useMemo(() => {
     const raw = user?.displayName || user?.email || 'SmartHeal';
@@ -70,6 +83,7 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
       {/* Sidebar Drawer Modal */}
       <Modal
         visible={drawerOpen}
@@ -84,7 +98,7 @@ const HomeScreen = () => {
             <View style={styles.drawerHeader}>
               <View style={styles.drawerLogo}>
                 <View style={styles.logoIcon}>
-                  <Icon name="heart" size={24} color="#FFFFFF" />
+                  <Image source={SmartHealLogo} style={styles.logoImage} resizeMode="contain" />
                 </View>
                 <View>
                   <Text style={styles.drawerBrand}>SmartHeal</Text>
@@ -166,7 +180,7 @@ const HomeScreen = () => {
 
               <View style={styles.menuDivider} />
 
-              <TouchableOpacity style={styles.menuItem} onPress={() => { setDrawerOpen(false); logout?.(); }}>
+              <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                 <Icon name="logout" size={22} color="#EF4444" />
                 <Text style={[styles.menuText, styles.logoutText]}>Sign Out</Text>
               </TouchableOpacity>
@@ -181,32 +195,42 @@ const HomeScreen = () => {
         </View>
       </Modal>
 
-      <LinearGradient colors={["#FFFFFF", "#F8FBFF"]} style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <LinearGradient 
+        colors={["#ffcf98ff","#FF6B3D", "#FF5252", "#FF7B9C", "#C084FC"]} 
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
+      >
+        {/* Gradient Header Section */}
+        <View style={styles.gradientHeader}>
           <View style={styles.topBar}>
-            <TouchableOpacity style={styles.iconButton} onPress={() => setDrawerOpen(true)}>
-              <Icon name="menu" size={18} color="#111827" />
+            <TouchableOpacity style={styles.iconButtonWhite} onPress={() => setDrawerOpen(true)}>
+              <Icon name="menu" size={18} color="#FFFFFF" />
             </TouchableOpacity>
-            <View style={styles.brandRow}>
-              <Icon name="heart" size={16} color="#F52E32" />
-              <Text style={styles.brand}>SmartHeal</Text>
-            </View>
             <View style={styles.topActions}>
-              <TouchableOpacity style={styles.iconButton}><Icon name="bell-outline" size={18} color="#111827" /></TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton}><Icon name="cog-outline" size={18} color="#111827" /></TouchableOpacity>
+              <TouchableOpacity style={styles.iconButtonWhite}><Icon name="bell-outline" size={18} color="#FFFFFF" /></TouchableOpacity>
+              <TouchableOpacity style={styles.iconButtonWhite}><Icon name="cog-outline" size={18} color="#FFFFFF" /></TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.heroRow}>
+          <View style={styles.heroRowGradient}>
             <View style={styles.heroCopy}>
-              <Text style={styles.heroGreeting}>Hey Dr. {name}! 👋</Text>
-              <Text style={styles.heroSub}>Beginner Runner • Week 3 of 12</Text>
+              <Text style={styles.heroGreetingWhite}>Good Morning</Text>
+              <Text style={styles.heroNameWhite}>{name}</Text>
             </View>
-            <LinearGradient colors={["#FF8F70", "#FF3D68"]} style={styles.streakBadge}>
-              <Text style={styles.streakNumber}>7</Text>
-              <Text style={styles.streakLabel}>day{"\n"}streak</Text>
-            </LinearGradient>
+            <View style={styles.profileScoreContainer}>
+              <View style={styles.profileAvatarHeader}>
+                <Icon name="account" size={28} color="#FFFFFF" />
+              </View>
+              <View style={styles.scoreBadge}>
+                <Text style={styles.scoreBadgeText}>92</Text>
+              </View>
+            </View>
           </View>
+        </View>
+      </LinearGradient>
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
           <LinearGradient colors={["#7C5CFF", "#F92F60"]} style={styles.calloutCard}>
             <View style={styles.calloutHeader}>
@@ -226,7 +250,7 @@ const HomeScreen = () => {
 
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Performance Overview</Text>
-            <TouchableOpacity><Text style={styles.link}>View All</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('PerformanceOverview' as never)}><Text style={styles.link}>View All</Text></TouchableOpacity>
           </View>
           <View style={styles.performanceGrid}>
             {performance.map((item) => (
@@ -283,33 +307,65 @@ const HomeScreen = () => {
             ))}
           </View>
 
-          <View style={styles.readinessCard}>
-            <View style={styles.readinessTop}>
-              <Text style={styles.readinessTitle}>Recovery Readiness</Text>
-              <Text style={styles.readinessScore}>{readiness.score}%</Text>
+          <LinearGradient colors={["#1e293b", "#0f172a"]} style={styles.readinessCard}>
+            {/* Header */}
+            <View style={styles.readinessHeader}>
+              <View style={styles.readinessLeft}>
+                <Text style={styles.readinessTitle}>Recovery Readiness</Text>
+                <Text style={styles.readinessUpdated}>Updated 2 hours ago</Text>
+              </View>
+              <View style={styles.readinessRight}>
+                <Text style={styles.readinessScore}>{readiness.score}%</Text>
+                <View style={styles.readinessDeltaContainer}>
+                  <Text style={styles.readinessDeltaArrow}>↑</Text>
+                  <Text style={styles.readinessDelta}>{readiness.delta}</Text>
+                </View>
+              </View>
             </View>
-            <Text style={styles.readinessDelta}>{readiness.delta}</Text>
+
+            {/* Progress Bar */}
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarBackground}>
+                <LinearGradient
+                  colors={["#10b981", "#22d3ee", "#a855f7"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.progressBarFill, { width: `${readiness.score}%` }]}
+                />
+              </View>
+            </View>
+
+            {/* Metrics Grid */}
             <View style={styles.readinessMetrics}>
-              {readiness.metrics.map((metric) => (
+              {readiness.metrics.map((metric, index) => (
                 <View key={metric.label} style={styles.metricChip}>
-                  <Icon name={metric.icon} size={16} color="#111827" />
+                  <Text style={styles.metricEmoji}>{index === 0 ? '💪' : index === 1 ? '😴' : '❤️'}</Text>
                   <Text style={styles.metricLabel}>{metric.label}</Text>
                   <Text style={styles.metricValue}>{metric.value}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </LinearGradient>
         </ScrollView>
-      </LinearGradient>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: '#F8FBFF' },
+  headerGradient: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ? StatusBar.currentHeight + 15 : 50 : 55,
+    paddingBottom: 16,
+    paddingHorizontal: 14,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  gradientHeader: {
+    // Container for gradient header content
+  },
   gradient: { flex: 1 },
-  scrollContent: { padding: 14, paddingBottom: 32 },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  scrollContent: { padding: 14, paddingBottom: 32, backgroundColor: '#F8FBFF' },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   iconButton: {
     width: 34,
     height: 34,
@@ -322,13 +378,70 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
   },
+  iconButtonWhite: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   brand: { fontWeight: '800', color: '#111827', fontSize: 14 },
-  topActions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  topActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  heroRowGradient: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   heroRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   heroCopy: { flex: 1 },
+  heroGreetingWhite: {
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    opacity: 0.9,
+  },
+  heroNameWhite: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginTop: 4,
+  },
   heroGreeting: { fontSize: 22, fontWeight: '800', color: '#0F172A', marginBottom: 6 },
   heroSub: { color: '#6B7280', lineHeight: 18 },
+  profileScoreContainer: {
+    alignItems: 'center',
+  },
+  profileAvatarHeader: {
+    width: 60,
+    height: 60,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  scoreBadge: {
+    position: 'absolute',
+    bottom: -8,
+    right: -8,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  scoreBadgeText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#EF4444',
+  },
   streakBadge: {
     width: 74,
     height: 74,
@@ -453,22 +566,96 @@ const styles = StyleSheet.create({
   sessionStat: { color: '#111827', fontWeight: '700' },
   readinessCard: {
     marginTop: 12,
-    backgroundColor: '#0F172A',
-    borderRadius: 18,
+    borderRadius: 20,
     padding: 14,
     shadowColor: '#000000',
-    shadowOpacity: 0.14,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
   },
-  readinessTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  readinessTitle: { color: '#E2E8F0', fontWeight: '800' },
-  readinessScore: { color: '#10B981', fontSize: 22, fontWeight: '800' },
-  readinessDelta: { color: '#10B981', marginTop: 4, fontWeight: '700' },
-  readinessMetrics: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
-  metricChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: '#111827', marginHorizontal: 4 },
-  metricLabel: { color: '#9CA3AF', fontSize: 12, marginTop: 4 },
-  metricValue: { color: '#E5E7EB', fontWeight: '800', marginTop: 2 },
+  readinessHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  readinessLeft: {
+    flex: 1,
+  },
+  readinessTitle: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 18,
+    marginBottom: 2,
+  },
+  readinessUpdated: {
+    color: '#9CA3AF',
+    fontSize: 11,
+  },
+  readinessRight: {
+    alignItems: 'flex-end',
+  },
+  readinessScore: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: '800',
+    lineHeight: 36,
+  },
+  readinessDeltaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  readinessDeltaArrow: {
+    color: '#10B981',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  readinessDelta: {
+    color: '#10B981',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  progressBarContainer: {
+    marginBottom: 12,
+  },
+  progressBarBackground: {
+    height: 8,
+    backgroundColor: '#374151',
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 999,
+  },
+  readinessMetrics: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  metricChip: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  metricEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  metricLabel: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  metricValue: {
+    color: '#D1D5DB',
+    fontSize: 11,
+  },
   
   // Drawer Styles
   drawerOverlay: {
@@ -510,9 +697,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: 32,
+    height: 32,
+  },
+  brandLogo: {
+    width: 20,
+    height: 20,
   },
   drawerBrand: {
     fontSize: 18,

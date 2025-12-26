@@ -113,9 +113,16 @@ const BasicInfoScreen = ({ navigation }: Props) => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF5EF" />
-      <LinearGradient colors={['#FFF5EF', '#FFFFFF']} style={styles.gradient}>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['rgba(255, 127, 80, 0.25)', 'rgba(255, 150, 180, 0.2)', 'rgba(180, 130, 255, 0.25)', 'rgba(255, 180, 200, 0.2)']}
+        locations={[0, 0.35, 0.65, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.bgGradient}
+      />
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.topRow}>
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -124,7 +131,7 @@ const BasicInfoScreen = ({ navigation }: Props) => {
             </TouchableOpacity>
 
             <View style={styles.brandPill}>
-              <Icon name="heart" size={18} color="#F52E32" />
+              <Icon name="heart" size={18} color="#ffffffff" />
               <Text style={styles.brandText}>SmartHeal</Text>
             </View>
           </View>
@@ -233,15 +240,21 @@ const BasicInfoScreen = ({ navigation }: Props) => {
             </TouchableOpacity>
           </Modal>
         </ScrollView>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#FFF5EF' },
-  container: { flex: 1 },
-  gradient: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  bgGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  safeArea: { flex: 1 },
   scrollContent: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 28 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   backButton: { flexDirection: 'row', alignItems: 'center', gap: 6 },

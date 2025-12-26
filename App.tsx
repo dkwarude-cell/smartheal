@@ -51,11 +51,11 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF5EF' }} edges={['top', 'left', 'right']}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF5EF' }} edges={['left', 'right']}>
           <AuthProvider>
             <ThemeProvider>
               <DeviceProvider>
-                <StatusBar style="dark" backgroundColor="#FFF5EF" translucent={false} />
+                <StatusBar style="light" backgroundColor="transparent" translucent={true} />
                 <AppNavigator />
               </DeviceProvider>
             </ThemeProvider>

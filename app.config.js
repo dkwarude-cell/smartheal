@@ -17,11 +17,17 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.runverve.smartheal",
+      entitlements: {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.access": []
+      },
       infoPlist: {
         NSCameraUsageDescription: "SmartHeal needs access to your camera to capture images for AI-powered therapy placement guidance.",
         NSMicrophoneUsageDescription: "SmartHeal needs access to your microphone for voice assistant features.",
         NSPhotoLibraryUsageDescription: "SmartHeal needs access to your photo library to save and load therapy session images.",
-        NSBluetoothAlwaysUsageDescription: "SmartHeal needs Bluetooth to connect with your ITT therapy device."
+        NSBluetoothAlwaysUsageDescription: "SmartHeal needs Bluetooth to connect with your ITT therapy device.",
+        NSHealthShareUsageDescription: "SmartHeal needs access to your health data to display your steps, active energy, sleep, and other health metrics for personalized therapy recommendations.",
+        NSHealthUpdateUsageDescription: "SmartHeal may write workout and therapy session data to Apple Health."
       }
     },
     android: {
